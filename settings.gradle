@@ -1,2 +1,3 @@
 include ':SeekArc_library' , ':SeekArc_sample'
+rootProject.name = "SeekArc"
 
