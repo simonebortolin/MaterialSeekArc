@@ -25,6 +25,8 @@ package com.triggertrap.sample;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -40,18 +42,6 @@ import com.triggertrap.seekarc.SeekArc;
  */
 public class SimpleActivity extends Activity {
 
-	private SeekArc mSeekArc;
-	private SeekBar mRotation;
-	private SeekBar mStartAngle;
-	private SeekBar mSweepAngle;
-	private SeekBar mArcWidth;
-	private SeekBar mProgressWidth;
-	private CheckBox mRoundedEdges;
-	private CheckBox mTouchInside;
-	private CheckBox mClockwise;
-	private TextView mSeekArcProgress;
-	private CheckBox mEnabled;
-
 	protected int getLayoutFile(){
 		return R.layout.holo_sample;
 	}
@@ -60,18 +50,21 @@ public class SimpleActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(getLayoutFile());
-		
-		mSeekArc = findViewById(R.id.seekArc);
-		mSeekArcProgress = findViewById(R.id.seekArcProgress);
-		mRotation = findViewById(R.id.rotation);
-		mStartAngle = findViewById(R.id.startAngle);
-		mSweepAngle  = findViewById(R.id.sweepAngle);
-		mArcWidth = findViewById(R.id.arcWidth);
-		mProgressWidth = findViewById(R.id.progressWidth);
-		mRoundedEdges = findViewById(R.id.roundedEdges);
-		mTouchInside = findViewById(R.id.touchInside);
-		mClockwise = findViewById(R.id.clockwise);
-		mEnabled = findViewById(R.id.enabled);
+
+		SeekArc mSeekArc = findViewById(R.id.seekArc);
+		TextView mSeekArcProgress = findViewById(R.id.seekArcProgress);
+		SeekBar mRotation = findViewById(R.id.rotation);
+		SeekBar mStartAngle = findViewById(R.id.startAngle);
+		SeekBar mSweepAngle = findViewById(R.id.sweepAngle);
+		SeekBar mArcWidth = findViewById(R.id.arcWidth);
+		SeekBar mProgressWidth = findViewById(R.id.progressWidth);
+		CheckBox mRoundedEdges = findViewById(R.id.roundedEdges);
+		CheckBox mTouchInside = findViewById(R.id.touchInside);
+		CheckBox mClockwise = findViewById(R.id.clockwise);
+		CheckBox mEnabled = findViewById(R.id.enabled);
+		Button mButton = findViewById(R.id.button);
+
+		mButton.setOnClickListener(v -> mSeekArc.setProgress(50,true,300));
 
 		mRotation.setProgress(mSeekArc.getArcRotation());
 		mStartAngle.setProgress(mSeekArc.getStartAngle());
@@ -171,6 +164,7 @@ public class SimpleActivity extends Activity {
 			
 			@Override
 			public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
+				mSeekArc.setActiveWidth(progress);
 				mSeekArc.invalidate();
 			}
 		});

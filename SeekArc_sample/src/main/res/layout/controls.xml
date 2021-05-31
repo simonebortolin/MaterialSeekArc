@@ -184,4 +184,10 @@
             android:checked="true" />
     </LinearLayout>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Animate"
+        android:id="@+id/button" />
+
 </LinearLayout>

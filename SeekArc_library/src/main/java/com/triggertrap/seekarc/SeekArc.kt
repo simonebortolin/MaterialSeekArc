@@ -10,6 +10,8 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.Transformation
 import androidx.annotation.ColorInt
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.material.shape.CornerFamily
@@ -253,7 +255,7 @@ class SeekArc : View {
             suggestedMinimumWidth,
             widthMeasureSpec
         )
-        val min: Int = min(width, height)
+        val min: Int = min(width, height) - 2*haloRadius
         mTranslateX = (width * 0.5f).toInt()
         mTranslateY = (height * 0.5f).toInt()
         val arcDiameter = min - paddingLeft
@@ -380,6 +382,29 @@ class SeekArc : View {
 
     fun setProgress(progress: Int) {
         updateProgress(progress, false)
+    }
+
+    fun setProgress(progress: Int, animated: Boolean, duration: Long = 300)  {
+        if (animated) {
+            val animation = SeekArcAnimation(this, this.progress, progress)
+            animation.setDuration(duration)
+            startAnimation(animation)
+        } else {
+            updateProgress(progress, false)
+        }
+    }
+
+    class SeekArcAnimation(
+        private val seekArc: SeekArc,
+        private val from: Int,
+        private val to: Int
+    ) :
+        Animation() {
+        override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+            super.applyTransformation(interpolatedTime, t)
+            val value = from + (to - from) * interpolatedTime
+            seekArc.setProgress(value.toInt())
+        }
     }
 
     private fun updateProgress(progress: Int, fromUser: Boolean) {
