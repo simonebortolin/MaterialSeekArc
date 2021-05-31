@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:seekarc="http://schemas.android.com/apk/res-auto"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true">
@@ -29,10 +29,10 @@
                 android:layout_height="150dp"
                 android:layout_gravity="center"
                 android:padding="30dp"
-                seekarc:rotation="180"
-                seekarc:startAngle="30"
-                seekarc:sweepAngle="300"
-                seekarc:touchInside="true" />
+                app:seekArc_rotation="180"
+                app:seekArc_startAngle="30"
+                app:seekArc_sweepAngle="300"
+                app:seekArc_touchInside="true" />
 
         </FrameLayout>
 
