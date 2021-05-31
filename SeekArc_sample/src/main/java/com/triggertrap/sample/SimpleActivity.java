@@ -35,7 +35,7 @@ public class SimpleActivity extends Activity {
 		Button mButton = findViewById(R.id.button);
 		Button mCancel = findViewById(R.id.cancel);
 
-		mButton.setOnClickListener(v -> mSeekArc.setProgress(0,true));
+		mButton.setOnClickListener(v -> mSeekArc.setProgress(10000,true));
 		mCancel.setOnClickListener(v -> mSeekArc.stopProgress());
 
 

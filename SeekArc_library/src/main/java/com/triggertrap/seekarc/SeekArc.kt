@@ -247,11 +247,18 @@ class SeekArc : View {
             thumbDrawable.draw(canvas)
         }
         if (isPressed || isFocused && mEnabled) {
-            val x = (mTranslateX - mThumbXPos)/ width.toInt()
-            val y = (mTranslateY - mThumbYPos) / height.toInt()
-            val background = this.background
-            //DrawableCompat.setHotspotBounds(background, x - haloRadius, y - haloRadius, x + haloRadius, y + haloRadius)
-            //canvas.drawCircle(x,y, haloRadius.toFloat(), mHaloPaint!!)
+            val x = (mTranslateX - mThumbXPos)/ width
+            val y = (mTranslateY - mThumbYPos) / height
+
+            if(background != null && background is RippleDrawable) {
+                DrawableCompat.setHotspotBounds(
+                    background,
+                    x - haloRadius,
+                    y - haloRadius,
+                    x + haloRadius,
+                    y + haloRadius
+                )
+            } else canvas.drawCircle(x.toFloat(),y.toFloat(), haloRadius.toFloat(), mHaloPaint!!)
         }
     }
 
@@ -399,12 +406,15 @@ class SeekArc : View {
 
     fun setProgress(progress: Int, animated: Boolean)  {
         if (animated) {
-            timeAnimator = TimeAnimator()
-            timeAnimator?.currentPlayTime = this.progress.toLong()
+            val startProgress = this.progress.toLong()
+            if(timeAnimator == null) {
+                timeAnimator = TimeAnimator()
+                timeAnimator?.currentPlayTime = startProgress
+            }
             timeAnimator?.setTimeListener{ animation, totalTime, _ ->
-                setProgress(totalTime.toInt()/1000)
+                setProgress(totalTime.toInt()/1000 + startProgress.toInt())
 
-                if(totalTime.toInt()/1000 >= max) animation.end()
+                if(totalTime.toInt()/1000 + startProgress.toInt() >= progress) animation.end()
 
             }
             timeAnimator?.start()

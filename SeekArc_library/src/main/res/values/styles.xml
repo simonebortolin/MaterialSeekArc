@@ -1,8 +1,7 @@
 <resources>
 
     <style name="BaseSeekArc"  parent="android:Widget">
-
-
+        <item name="android:background">?attr/controlBackground</item>
     </style>
     
     <style name="SeekArcLight" parent="BaseSeekArc">
