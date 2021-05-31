@@ -78,7 +78,7 @@ public class SimpleActivity extends Activity {
 		mSweepAngle.setProgress(mSeekArc.getSweepAngle());
 		mArcWidth.setProgress(mSeekArc.getInactiveWidth());
 
-		mSeekArc.setOnSeekArcChangeListener(new SeekArc.OnSeekArcChangeListener() {
+		mSeekArc.setOnSeekArcChangeListener(new SeekArc.OnSeekProgressChangeListener() {
 
 			@Override
 			public void onStopTrackingTouch(SeekArc seekArc) {

@@ -37,7 +37,6 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.ViewCompat
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -100,10 +99,10 @@ class SeekArc : View {
     private var mThumbYPos: Int = 0
     private var mTouchAngle: Double = 0.0
     private var mTouchIgnoreRadius: Float = 0f
-    private var mOnSeekArcChangeListener: OnSeekArcChangeListener? = null
+    private var mOnSeekProgressChangeListener: OnSeekProgressChangeListener? = null
     private var defaultThumbRadius: Int = 0
 
-    interface OnSeekArcChangeListener {
+    interface OnSeekProgressChangeListener {
         /**
          * Notification that the progress level has changed. Clients can use the
          * fromUser parameter to distinguish user-initiated changes from those
@@ -173,7 +172,16 @@ class SeekArc : View {
     }
 
     private fun loadResources(resources: Resources) {
+        haloRadius = resources.getDimensionPixelSize(R.dimen.mtrl_slider_halo_radius)
+
+        thumbElevation = resources.getDimensionPixelSize(R.dimen.mtrl_slider_thumb_elevation).toFloat()
+
         thumbRadius = resources.getDimensionPixelSize(R.dimen.mtrl_slider_thumb_radius)
+
+        inactiveWidth = resources.getDimensionPixelSize(R.dimen.mtrl_slider_track_height)
+
+        activeWidth = resources.getDimensionPixelSize(R.dimen.mtrl_slider_track_height)
+
         defaultThumbRadius = thumbRadius
     }
 
@@ -253,7 +261,14 @@ class SeekArc : View {
             )
             thumbDrawable.draw(canvas)
         }
+        if (isPressed || isFocused && mEnabled) {
+            val x = (mTranslateX - mThumbXPos)/ width.toFloat()
+            val y = (mTranslateY - mThumbYPos) / height.toFloat()
+            canvas.drawCircle(x,y, haloRadius.toFloat(), mHaloPaint!!)
+        }
     }
+
+
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val height: Int = getDefaultSize(
@@ -285,6 +300,7 @@ class SeekArc : View {
             parent.requestDisallowInterceptTouchEvent(true)
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
+                    isPressed = true
                     onStartTrackingTouch()
                     updateOnTouch(event)
                 }
@@ -314,15 +330,16 @@ class SeekArc : View {
         invalidate()
     }
 
+
     private fun onStartTrackingTouch() {
-        if (mOnSeekArcChangeListener != null) {
-            mOnSeekArcChangeListener!!.onStartTrackingTouch(this)
+        if (mOnSeekProgressChangeListener != null) {
+            mOnSeekProgressChangeListener!!.onStartTrackingTouch(this)
         }
     }
 
     private fun onStopTrackingTouch() {
-        if (mOnSeekArcChangeListener != null) {
-            mOnSeekArcChangeListener!!.onStopTrackingTouch(this)
+        if (mOnSeekProgressChangeListener != null) {
+            mOnSeekProgressChangeListener!!.onStopTrackingTouch(this)
         }
     }
 
@@ -333,6 +350,7 @@ class SeekArc : View {
         }
         isPressed = true
         mTouchAngle = getTouchDegrees(event.x, event.y)
+
         val progress: Int = getProgressForAngle(mTouchAngle)
         updateProgress(progress, true)
     }
@@ -384,13 +402,17 @@ class SeekArc : View {
         mThumbYPos = (mArcRadius * sin(Math.toRadians(thumbAngle.toDouble()))).toInt()
     }
 
+    fun setProgress(progress: Int) {
+        updateProgress(progress, false)
+    }
+
     private fun updateProgress(progress: Int, fromUser: Boolean) {
         if (progress == INVALID_PROGRESS_VALUE) {
             return
         }
-        this.progress = sanitizeInput(progress, 0, 100)
-        if (mOnSeekArcChangeListener != null) {
-            mOnSeekArcChangeListener!!
+        this.progress = sanitizeInput(progress, 0, max)
+        if (mOnSeekProgressChangeListener != null) {
+            mOnSeekProgressChangeListener!!
                 .onProgressChanged(this, progress, fromUser)
         }
         updateThumbPosition()
@@ -405,10 +427,10 @@ class SeekArc : View {
      * @param l
      * The seek bar notification listener
      *
-     * @see SeekArc.OnSeekArcChangeListener
+     * @see SeekArc.OnSeekProgressChangeListener
      */
-    fun setOnSeekArcChangeListener(l: OnSeekArcChangeListener?) {
-        mOnSeekArcChangeListener = l
+    fun setOnSeekArcChangeListener(l: OnSeekProgressChangeListener?) {
+        mOnSeekProgressChangeListener = l
     }
     fun setRoundedEdges(isEnabled: Boolean) {
         mRoundedEdges = isEnabled
@@ -453,12 +475,14 @@ class SeekArc : View {
     }
     var progress: Int = 0
         private set
+
     var activeWidth: Int = 4
         set(value) {
             field = value
             mActiveTrackPart!!.strokeWidth = field.toFloat()
             invalidate()
         }
+
     var inactiveWidth: Int = 4
         set(value) {
             field = value
