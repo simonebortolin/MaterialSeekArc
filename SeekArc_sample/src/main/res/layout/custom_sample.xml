@@ -23,19 +23,20 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="30dp"
-            app:seekArc_clockwise="true"
-            app:seekArc_max="150"
-            app:seekArc_rotation="180"
-            app:seekArc_startAngle="30"
-            app:seekArc_sweepAngle="300"
-            app:seekArc_touchInside="true" />
+            app:clockwise="true"
+            android:valueFrom="-100"
+            android:valueTo="100"
+            app:rotation="180"
+            app:startAngle="30"
+            app:sweepAngle="300"
+            app:touchInside="true" />
 
         <TextView
             android:id="@+id/seekArcProgress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="0"
+            android:text="-100"
             android:textSize="40sp" />
     </FrameLayout>
 

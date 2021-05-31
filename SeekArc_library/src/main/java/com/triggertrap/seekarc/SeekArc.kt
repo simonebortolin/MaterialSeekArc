@@ -15,6 +15,7 @@ import android.view.animation.Animation
 import android.view.animation.Transformation
 import androidx.annotation.ColorInt
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -38,6 +39,9 @@ class SeekArc : View {
      * The Maximum value that this SeekArc can be set to
      */
     var max: Int = 100
+    var min: Int = 0
+
+    var half: Int = (max + min)/2
 
     /**
      * The rotation of the SeekArc- 0 is twelve o'clock
@@ -90,7 +94,9 @@ class SeekArc : View {
          * The SeekArc whose progress has changed
          * @param progress
          * The current progress level. This will be in the range
-         * 0..max where max was set by
+         * min..max where min was set by
+         * [SeekArc.min]. (The default value for
+         * max is 0.) and max was set by
          * [SeekArc.max]. (The default value for
          * max is 100.)
          * @param fromUser
@@ -175,46 +181,48 @@ class SeekArc : View {
             R.styleable.SeekArc, defStyle, R.style.BaseSeekArc
         )
 
-        inactiveColor = a.getColorStateList(R.styleable.SeekArc_seekArc_trackColorInactive) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_inactive_track_color)
+        inactiveColor = a.getColorStateList(R.styleable.SeekArc_trackColorInactive) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_inactive_track_color)
 
-        inactiveWidth = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_trackWidthInactive, inactiveWidth)
+        inactiveWidth = a.getDimensionPixelSize(R.styleable.SeekArc_trackWidthInactive, inactiveWidth)
 
-        activeColor = a.getColorStateList(R.styleable.SeekArc_seekArc_trackColorActive) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_active_track_color)
+        activeColor = a.getColorStateList(R.styleable.SeekArc_trackColorActive) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_active_track_color)
 
-        activeWidth = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_trackWidthActive, activeWidth)
+        activeWidth = a.getDimensionPixelSize(R.styleable.SeekArc_trackWidthActive, activeWidth)
 
-        if(a.hasValue(R.styleable.SeekArc_seekArc_thumbStrokeColor))
-            thumbStrokeColor = a.getColorStateList(R.styleable.SeekArc_seekArc_thumbStrokeColor)
+        if(a.hasValue(R.styleable.SeekArc_thumbStrokeColor))
+            thumbStrokeColor = a.getColorStateList(R.styleable.SeekArc_thumbStrokeColor)
 
-        thumbStrokeWidth = a.getDimension(R.styleable.SeekArc_seekArc_thumbStrokeWidth, thumbStrokeWidth)
+        thumbStrokeWidth = a.getDimension(R.styleable.SeekArc_thumbStrokeWidth, thumbStrokeWidth)
 
-        thumbColor = a.getColorStateList(R.styleable.SeekArc_seekArc_thumbColor) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_thumb_color)
+        thumbColor = a.getColorStateList(R.styleable.SeekArc_thumbColor) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_thumb_color)
 
-        thumbRadius = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_thumbRadius, thumbRadius)
+        thumbRadius = a.getDimensionPixelSize(R.styleable.SeekArc_thumbRadius, thumbRadius)
 
-        thumbElevation = a.getDimension(R.styleable.SeekArc_seekArc_thumbElevation, thumbElevation)
+        thumbElevation = a.getDimension(R.styleable.SeekArc_thumbElevation, thumbElevation)
 
-        haloColor = a.getColorStateList(R.styleable.SeekArc_seekArc_haloColor) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_halo_color)
+        haloColor = a.getColorStateList(R.styleable.SeekArc_haloColor) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_halo_color)
 
-        haloRadius = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_haloRadius, haloRadius)
+        haloRadius = a.getDimensionPixelSize(R.styleable.SeekArc_haloRadius, haloRadius)
 
-        max = a.getInteger(R.styleable.SeekArc_seekArc_max, max)
+        max = a.getInteger(R.styleable.SeekArc_android_valueTo, max)
 
-        progress = a.getInteger(R.styleable.SeekArc_seekArc_progress, progress)
+        min = a.getInteger(R.styleable.SeekArc_android_valueFrom, min)
 
-        startAngle = a.getInt(R.styleable.SeekArc_seekArc_startAngle, startAngle)
+        progress = a.getInteger(R.styleable.SeekArc_android_value, progress)
 
-        sweepAngle = a.getInt(R.styleable.SeekArc_seekArc_sweepAngle, sweepAngle)
+        startAngle = a.getInt(R.styleable.SeekArc_startAngle, startAngle)
 
-        mRotation = a.getInt(R.styleable.SeekArc_seekArc_rotation, mRotation)
+        sweepAngle = a.getInt(R.styleable.SeekArc_sweepAngle, sweepAngle)
 
-        mRoundedEdges = a.getBoolean(R.styleable.SeekArc_seekArc_roundEdges, mRoundedEdges )
+        mRotation = a.getInt(R.styleable.SeekArc_rotation, mRotation)
 
-        mTouchInside = a.getBoolean(R.styleable.SeekArc_seekArc_touchInside, mTouchInside )
+        mRoundedEdges = a.getBoolean(R.styleable.SeekArc_roundEdges, mRoundedEdges )
 
-        isClockwise = a.getBoolean( R.styleable.SeekArc_seekArc_clockwise, isClockwise )
+        mTouchInside = a.getBoolean(R.styleable.SeekArc_touchInside, mTouchInside )
 
-        mEnabled = a.getBoolean(R.styleable.SeekArc_seekArc_enabled, mEnabled)
+        isClockwise = a.getBoolean( R.styleable.SeekArc_clockwise, isClockwise )
+
+        mEnabled = a.getBoolean(R.styleable.SeekArc_android_enabled, mEnabled)
 
         a.recycle()
     }
@@ -228,7 +236,7 @@ class SeekArc : View {
         val arcStart: Int = startAngle + ANGLE_OFFSET + mRotation
         val arcSweep: Int = sweepAngle
         canvas.drawArc(mArcRect, arcStart.toFloat(), arcSweep.toFloat(), false, mInactiveTrackPart!!)
-        if (progress > 0)
+        if (progress > min)
             canvas.drawArc(mArcRect, arcStart.toFloat(), progressSweep, false, mActiveTrackPart!!)
         if (mEnabled) {
             // Draw the thumb nail
@@ -239,9 +247,11 @@ class SeekArc : View {
             thumbDrawable.draw(canvas)
         }
         if (isPressed || isFocused && mEnabled) {
-            val x = (mTranslateX - mThumbXPos)/ width.toFloat()
-            val y = (mTranslateY - mThumbYPos) / height.toFloat()
-            canvas.drawCircle(x,y, haloRadius.toFloat(), mHaloPaint!!)
+            val x = (mTranslateX - mThumbXPos)/ width.toInt()
+            val y = (mTranslateY - mThumbYPos) / height.toInt()
+            val background = this.background
+            //DrawableCompat.setHotspotBounds(background, x - haloRadius, y - haloRadius, x + haloRadius, y + haloRadius)
+            //canvas.drawCircle(x,y, haloRadius.toFloat(), mHaloPaint!!)
         }
     }
 
@@ -361,18 +371,18 @@ class SeekArc : View {
     }
 
     private fun getProgressForAngle(angle: Double): Int {
-        var touchProgress: Int = (valuePerDegree() * angle).roundToLong().toInt()
-        touchProgress = if (touchProgress < 0) if(progress != max) 0 else max else touchProgress
-        touchProgress = if (touchProgress > max) if(progress != 0) max else 0 else touchProgress
+        var touchProgress: Int = (valuePerDegree() * angle).roundToLong().toInt() + min
+        touchProgress = if (touchProgress < min) if(progress != max) min else max else touchProgress
+        touchProgress = if (touchProgress > max) if(progress != min) max else min else touchProgress
 
-        if(progress == max && touchProgress <=max/2)  touchProgress = max
-        if(progress == 0 && touchProgress >=max/2)  touchProgress = 0
+        if(progress == max && touchProgress <= half)  touchProgress = max
+        if(progress == min && touchProgress >= half)  touchProgress = min
 
         return touchProgress
     }
 
     private fun valuePerDegree(): Float {
-        return max.toFloat() / sweepAngle
+        return (max-min).toFloat() / sweepAngle
     }
 
     private fun updateThumbPosition() {
@@ -392,9 +402,9 @@ class SeekArc : View {
             timeAnimator = TimeAnimator()
             timeAnimator?.currentPlayTime = this.progress.toLong()
             timeAnimator?.setTimeListener{ animation, totalTime, _ ->
-                setProgress(totalTime.toInt()/100)
+                setProgress(totalTime.toInt()/1000)
 
-                if(totalTime.toInt()/100 >= max) animation.end()
+                if(totalTime.toInt()/1000 >= max) animation.end()
 
             }
             timeAnimator?.start()
@@ -414,7 +424,7 @@ class SeekArc : View {
         if (progress == INVALID_PROGRESS_VALUE) {
             return
         }
-        this.progress = sanitizeInput(progress, 0, max)
+        this.progress = sanitizeInput(progress, min, max)
         if (mOnSeekProgressChangeListener != null) {
             mOnSeekProgressChangeListener!!
                 .onProgressChanged(this, progress, fromUser)
@@ -615,7 +625,7 @@ class SeekArc : View {
 
     private val progressSweep: Float
         get() {
-            return progress.toFloat() / max * sweepAngle
+            return (progress.toFloat()-min) / (max-min) * sweepAngle
         }
 
 

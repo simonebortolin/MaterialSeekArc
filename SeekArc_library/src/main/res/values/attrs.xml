@@ -24,28 +24,29 @@
 <resources>
 
     <declare-styleable name="SeekArc">
-        <attr name="seekArc_trackColorInactive" format="color" />
-        <attr name="seekArc_trackWidthInactive" format="dimension" />
-        <attr name="seekArc_trackColorActive" format="color" />
-        <attr name="seekArc_trackWidthActive" format="dimension" />
-        <attr name="seekArc_thumbStrokeColor" format="color" />
-        <attr name="seekArc_thumbStrokeWidth" format="dimension" />
-        <attr name="seekArc_thumbRadius" format="dimension" />
-        <attr name="seekArc_thumbElevation" format="dimension" />
-        <attr name="seekArc_thumbColor" format="color" />
-        <attr name="seekArc_haloColor" format="color" />
-        <attr name="seekArc_haloRadius" format="dimension" />
+        <attr name="trackColorInactive" format="color" />
+        <attr name="trackWidthInactive" format="dimension" />
+        <attr name="trackColorActive" format="color" />
+        <attr name="trackWidthActive" format="dimension" />
+        <attr name="thumbStrokeColor" format="color" />
+        <attr name="thumbStrokeWidth" format="dimension" />
+        <attr name="thumbRadius" format="dimension" />
+        <attr name="thumbElevation" format="dimension" />
+        <attr name="thumbColor" format="color" />
+        <attr name="haloColor" format="color" />
+        <attr name="haloRadius" format="dimension" />
+        <attr name="rotation" format="integer" />
+        <attr name="startAngle" format="integer" />
+        <attr name="sweepAngle" format="integer" />
 
-        <attr name="seekArc_max" format="integer" />
-        <attr name="seekArc_progress" format="integer" />
-        <attr name="seekArc_rotation" format="integer" />
-        <attr name="seekArc_startAngle" format="integer" />
-        <attr name="seekArc_sweepAngle" format="integer" />
+        <attr name="roundEdges" format="boolean" />
+        <attr name="touchInside" format="boolean" />
+        <attr name="clockwise" format="boolean" />
 
-        <attr name="seekArc_roundEdges" format="boolean" />
-        <attr name="seekArc_touchInside" format="boolean" />
-        <attr name="seekArc_clockwise" format="boolean" />
-        <attr name="seekArc_enabled" format="boolean" />
+        <attr name="android:enabled" format="boolean" />
+        <attr name="android:valueTo" format="integer" />
+        <attr name="android:valueFrom" format="integer" />
+        <attr name="android:value" format="integer" />
     </declare-styleable>
     
     <declare-styleable name="SeekArcTheme">
