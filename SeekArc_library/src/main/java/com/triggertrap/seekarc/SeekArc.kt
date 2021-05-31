@@ -1,5 +1,6 @@
 package com.triggertrap.seekarc
 
+import android.animation.TimeAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Resources
@@ -384,28 +385,30 @@ class SeekArc : View {
         updateProgress(progress, false)
     }
 
-    fun setProgress(progress: Int, animated: Boolean, duration: Long = 300)  {
+    private var timeAnimator : TimeAnimator? = null
+
+    fun setProgress(progress: Int, animated: Boolean)  {
         if (animated) {
-            val animation = SeekArcAnimation(this, this.progress, progress)
-            animation.setDuration(duration)
-            startAnimation(animation)
+            timeAnimator = TimeAnimator()
+            timeAnimator?.currentPlayTime = this.progress.toLong()
+            timeAnimator?.setTimeListener{ animation, totalTime, _ ->
+                setProgress(totalTime.toInt()/100)
+
+                if(totalTime.toInt()/100 >= max) animation.end()
+
+            }
+            timeAnimator?.start()
         } else {
             updateProgress(progress, false)
         }
     }
 
-    class SeekArcAnimation(
-        private val seekArc: SeekArc,
-        private val from: Int,
-        private val to: Int
-    ) :
-        Animation() {
-        override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
-            super.applyTransformation(interpolatedTime, t)
-            val value = from + (to - from) * interpolatedTime
-            seekArc.setProgress(value.toInt())
-        }
+    fun stopProgress() {
+        timeAnimator?.end()
     }
+
+
+
 
     private fun updateProgress(progress: Int, fromUser: Boolean) {
         if (progress == INVALID_PROGRESS_VALUE) {
