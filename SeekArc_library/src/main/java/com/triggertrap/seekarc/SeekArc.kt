@@ -24,6 +24,7 @@
 package com.triggertrap.seekarc
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.content.res.TypedArray
 import android.graphics.Canvas
@@ -34,7 +35,9 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import com.triggertrap.seekarc.SeekArc
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import kotlin.math.*
 
 /**
  *
@@ -56,6 +59,10 @@ class SeekArc : View {
      */
     var max: Int = 100
 
+    private var mHaloRadius: Int = 0
+
+    private var mHaloColor: Int = 0
+
     /**
      * The Current value that the SeekArc is set to
      */
@@ -67,9 +74,9 @@ class SeekArc : View {
     private var mProgressWidth: Int = 4
 
     /**
-     * The Width of the background arc for the SeekArc
+     * The width of the progress line for this SeekArc
      */
-    private var mArcWidth: Int = 2
+    private var mArcWidth: Int = 4
 
     /**
      * The Angle to start drawing this Arc from
@@ -120,7 +127,7 @@ class SeekArc : View {
     private var mTouchIgnoreRadius: Float = 0f
     private var mOnSeekArcChangeListener: OnSeekArcChangeListener? = null
 
-    open interface OnSeekArcChangeListener {
+    interface OnSeekArcChangeListener {
         /**
          * Notification that the progress level has changed. Clients can use the
          * fromUser parameter to distinguish user-initiated changes from those
@@ -131,7 +138,7 @@ class SeekArc : View {
          * @param progress
          * The current progress level. This will be in the range
          * 0..max where max was set by
-         * [ProgressArc.setMax]. (The default value for
+         * [SeekArc.max]. (The default value for
          * max is 100.)
          * @param fromUser
          * True if the progress change was initiated by the user.
@@ -158,11 +165,11 @@ class SeekArc : View {
     }
 
     constructor(context: Context) : super(context) {
-        init(context, null, 0)
+        processAttributes(context, null, 0)
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init(context, attrs, R.attr.seekArcStyle)
+        processAttributes(context, attrs, R.attr.seekArcStyle)
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
@@ -170,91 +177,83 @@ class SeekArc : View {
         attrs,
         defStyle
     ) {
-        init(context, attrs, defStyle)
+        processAttributes(context, attrs, defStyle)
     }
 
-    private fun init(context: Context, attrs: AttributeSet?, defStyle: Int) {
+    private fun processAttributes(context: Context, attrs: AttributeSet?, defStyle: Int) {
         Log.d(TAG, "Initialising SeekArc")
-        val res: Resources = getResources()
-        val density: Float = context.getResources().getDisplayMetrics().density
+        val res: Resources = resources
+        val density: Float = context.resources.displayMetrics.density
 
         // Defaults, may need to link this into theme settings
-        var arcColor: Int = res.getColor(R.color.progress_gray)
-        var progressColor: Int = res.getColor(R.color.default_blue_light)
-        var thumbHalfheight: Int = 0
-        var thumbHalfWidth: Int = 0
-        mThumb = res.getDrawable(R.drawable.seek_arc_control_selector)
+        var arcColor: Int = ContextCompat.getColor(context,R.color.material_slider_active_track_color)
+        var progressColor: Int = ContextCompat.getColor(context,R.color.material_slider_thumb_color)
+
+
         // Convert progress width to pixels for current density
-        mProgressWidth = (mProgressWidth * density).toInt()
+        this.mArcWidth = (this.mArcWidth * density).toInt()
         if (attrs != null) {
             // Attribute initialization
             val a: TypedArray = context.obtainStyledAttributes(
                 attrs,
                 R.styleable.SeekArc, defStyle, 0
             )
-            val thumb: Drawable? = a.getDrawable(R.styleable.SeekArc_thumb)
-            if (thumb != null) {
-                mThumb = thumb
-            }
-            thumbHalfheight = mThumb!!.getIntrinsicHeight() / 2
-            thumbHalfWidth = mThumb!!.getIntrinsicWidth() / 2
-            mThumb!!.setBounds(
-                -thumbHalfWidth, -thumbHalfheight, thumbHalfWidth,
-                thumbHalfheight
-            )
-            max = a.getInteger(R.styleable.SeekArc_max, max)
-            mProgress = a.getInteger(R.styleable.SeekArc_progress, mProgress)
+
+            thumb = a.getDrawable(R.styleable.SeekArc_seekArc_thumb) ?: ResourcesCompat.getDrawable(res, R.drawable.seek_arc_control_selector, context.theme)
+
+            max = a.getInteger(R.styleable.SeekArc_seekArc_max, max)
+            mProgress = a.getInteger(R.styleable.SeekArc_seekArc_progress, mProgress)
             mProgressWidth = a.getDimension(
-                R.styleable.SeekArc_progressWidth, mProgressWidth.toFloat()
+                R.styleable.SeekArc_seekArc_progressWidth, mProgressWidth.toFloat()
             ).toInt()
             mArcWidth = a.getDimension(
-                R.styleable.SeekArc_arcWidth,
-                mArcWidth.toFloat()
+                R.styleable.SeekArc_seekArc_arcWidth,
+                this.mArcWidth.toFloat()
             ).toInt()
-            mStartAngle = a.getInt(R.styleable.SeekArc_startAngle, mStartAngle)
-            mSweepAngle = a.getInt(R.styleable.SeekArc_sweepAngle, mSweepAngle)
-            mRotation = a.getInt(R.styleable.SeekArc_rotation, mRotation)
+            mStartAngle = a.getInt(R.styleable.SeekArc_seekArc_startAngle, mStartAngle)
+            mSweepAngle = a.getInt(R.styleable.SeekArc_seekArc_sweepAngle, mSweepAngle)
+            mRotation = a.getInt(R.styleable.SeekArc_seekArc_rotation, mRotation)
             mRoundedEdges = a.getBoolean(
-                R.styleable.SeekArc_roundEdges,
+                R.styleable.SeekArc_seekArc_roundEdges,
                 mRoundedEdges
             )
             mTouchInside = a.getBoolean(
-                R.styleable.SeekArc_touchInside,
+                R.styleable.SeekArc_seekArc_touchInside,
                 mTouchInside
             )
             isClockwise = a.getBoolean(
-                R.styleable.SeekArc_clockwise,
+                R.styleable.SeekArc_seekArc_clockwise,
                 isClockwise
             )
-            mEnabled = a.getBoolean(R.styleable.SeekArc_enabled, mEnabled)
-            arcColor = a.getColor(R.styleable.SeekArc_arcColor, arcColor)
+            mEnabled = a.getBoolean(R.styleable.SeekArc_seekArc_enabled, mEnabled)
+            arcColor = a.getColor(R.styleable.SeekArc_seekArc_arcColor, arcColor)
             progressColor = a.getColor(
-                R.styleable.SeekArc_progressColor,
+                R.styleable.SeekArc_seekArc_progressColor,
                 progressColor
             )
             a.recycle()
         }
-        mProgress = if ((mProgress > max)) max else mProgress
-        mProgress = if ((mProgress < 0)) 0 else mProgress
-        mSweepAngle = if ((mSweepAngle > 360)) 360 else mSweepAngle
-        mSweepAngle = if ((mSweepAngle < 0)) 0 else mSweepAngle
+        mProgress = if (mProgress > max) max else mProgress
+        mProgress = if (mProgress < 0) 0 else mProgress
+        mSweepAngle = if (mSweepAngle > 360) 360 else mSweepAngle
+        mSweepAngle = if (mSweepAngle < 0) 0 else mSweepAngle
         mProgressSweep = mProgress.toFloat() / max * mSweepAngle
-        mStartAngle = if ((mStartAngle > 360)) 0 else mStartAngle
-        mStartAngle = if ((mStartAngle < 0)) 0 else mStartAngle
+        mStartAngle = if (mStartAngle > 360) 0 else mStartAngle
+        mStartAngle = if (mStartAngle < 0) 0 else mStartAngle
         mArcPaint = Paint()
-        mArcPaint!!.setColor(arcColor)
-        mArcPaint!!.setAntiAlias(true)
-        mArcPaint!!.setStyle(Paint.Style.STROKE)
-        mArcPaint!!.setStrokeWidth(mArcWidth.toFloat())
-        //mArcPaint.setAlpha(45);
+        mArcPaint!!.color = arcColor
+        mArcPaint!!.isAntiAlias = true
+        mArcPaint!!.style = Paint.Style.STROKE
+        mArcPaint!!.strokeWidth = this.mArcWidth.toFloat()
+
         mProgressPaint = Paint()
-        mProgressPaint!!.setColor(progressColor)
-        mProgressPaint!!.setAntiAlias(true)
-        mProgressPaint!!.setStyle(Paint.Style.STROKE)
-        mProgressPaint!!.setStrokeWidth(mProgressWidth.toFloat())
+        mProgressPaint!!.color = progressColor
+        mProgressPaint!!.isAntiAlias = true
+        mProgressPaint!!.style = Paint.Style.STROKE
+        mProgressPaint!!.strokeWidth = this.mArcWidth.toFloat()
         if (mRoundedEdges) {
-            mArcPaint!!.setStrokeCap(Paint.Cap.ROUND)
-            mProgressPaint!!.setStrokeCap(Paint.Cap.ROUND)
+            mArcPaint!!.strokeCap = Paint.Cap.ROUND
+            mProgressPaint!!.strokeCap = Paint.Cap.ROUND
         }
     }
 
@@ -266,11 +265,9 @@ class SeekArc : View {
         // Draw the arcs
         val arcStart: Int = mStartAngle + mAngleOffset + mRotation
         val arcSweep: Int = mSweepAngle
-        canvas.drawArc(mArcRect, arcStart.toFloat(), arcSweep.toFloat(), false, (mArcPaint)!!)
-        canvas.drawArc(
-            mArcRect, arcStart.toFloat(), mProgressSweep, false,
-            (mProgressPaint)!!
-        )
+        canvas.drawArc(mArcRect, arcStart.toFloat(), arcSweep.toFloat(), false, mArcPaint!!)
+        if (mProgress > 0)
+            canvas.drawArc(mArcRect, arcStart.toFloat(), mProgressSweep, false, mProgressPaint!!)
         if (mEnabled) {
             // Draw the thumb nail
             canvas.translate(
@@ -283,35 +280,33 @@ class SeekArc : View {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val height: Int = getDefaultSize(
-            getSuggestedMinimumHeight(),
+            suggestedMinimumHeight,
             heightMeasureSpec
         )
         val width: Int = getDefaultSize(
-            getSuggestedMinimumWidth(),
+            suggestedMinimumWidth,
             widthMeasureSpec
         )
-        val min: Int = Math.min(width, height)
-        var top: Float = 0f
-        var left: Float = 0f
-        var arcDiameter: Int = 0
+        val min: Int = min(width, height)
         mTranslateX = (width * 0.5f).toInt()
         mTranslateY = (height * 0.5f).toInt()
-        arcDiameter = min - getPaddingLeft()
+        val arcDiameter = min - paddingLeft
         mArcRadius = arcDiameter / 2
-        top = (height / 2 - (arcDiameter / 2)).toFloat()
-        left = (width / 2 - (arcDiameter / 2)).toFloat()
+        val top = (height / 2 - (arcDiameter / 2)).toFloat()
+        val left = (width / 2 - (arcDiameter / 2)).toFloat()
         mArcRect.set(left, top, left + arcDiameter, top + arcDiameter)
         val arcStart: Int = mProgressSweep.toInt() + mStartAngle + mRotation + 90
-        mThumbXPos = (mArcRadius * Math.cos(Math.toRadians(arcStart.toDouble()))).toInt()
-        mThumbYPos = (mArcRadius * Math.sin(Math.toRadians(arcStart.toDouble()))).toInt()
+        mThumbXPos = (mArcRadius * cos(Math.toRadians(arcStart.toDouble()))).toInt()
+        mThumbYPos = (mArcRadius * sin(Math.toRadians(arcStart.toDouble()))).toInt()
         setTouchInSide(mTouchInside)
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
-    public override fun onTouchEvent(event: MotionEvent): Boolean {
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
         if (mEnabled) {
-            getParent().requestDisallowInterceptTouchEvent(true)
-            when (event.getAction()) {
+            parent.requestDisallowInterceptTouchEvent(true)
+            when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     onStartTrackingTouch()
                     updateOnTouch(event)
@@ -319,13 +314,13 @@ class SeekArc : View {
                 MotionEvent.ACTION_MOVE -> updateOnTouch(event)
                 MotionEvent.ACTION_UP -> {
                     onStopTrackingTouch()
-                    setPressed(false)
-                    getParent().requestDisallowInterceptTouchEvent(false)
+                    isPressed = false
+                    parent.requestDisallowInterceptTouchEvent(false)
                 }
                 MotionEvent.ACTION_CANCEL -> {
                     onStopTrackingTouch()
-                    setPressed(false)
-                    getParent().requestDisallowInterceptTouchEvent(false)
+                    isPressed = false
+                    parent.requestDisallowInterceptTouchEvent(false)
                 }
             }
             return true
@@ -335,9 +330,9 @@ class SeekArc : View {
 
     override fun drawableStateChanged() {
         super.drawableStateChanged()
-        if (mThumb != null && mThumb!!.isStateful()) {
-            val state: IntArray = getDrawableState()
-            mThumb!!.setState(state)
+        if (mThumb != null && mThumb!!.isStateful) {
+            val state: IntArray = drawableState
+            mThumb!!.state = state
         }
         invalidate()
     }
@@ -355,21 +350,21 @@ class SeekArc : View {
     }
 
     private fun updateOnTouch(event: MotionEvent) {
-        val ignoreTouch: Boolean = ignoreTouch(event.getX(), event.getY())
+        val ignoreTouch: Boolean = ignoreTouch(event.x, event.y)
         if (ignoreTouch) {
             return
         }
-        setPressed(true)
-        mTouchAngle = getTouchDegrees(event.getX(), event.getY())
+        isPressed = true
+        mTouchAngle = getTouchDegrees(event.x, event.y)
         val progress: Int = getProgressForAngle(mTouchAngle)
         onProgressRefresh(progress, true)
     }
 
     private fun ignoreTouch(xPos: Float, yPos: Float): Boolean {
-        var ignore: Boolean = false
+        var ignore = false
         val x: Float = xPos - mTranslateX
         val y: Float = yPos - mTranslateY
-        val touchRadius: Float = Math.sqrt(((x * x) + (y * y)).toDouble()).toFloat()
+        val touchRadius: Float = sqrt((x * x) + (y * y).toDouble()).toFloat()
         if (touchRadius < mTouchIgnoreRadius) {
             ignore = true
         }
@@ -380,23 +375,23 @@ class SeekArc : View {
         var x: Float = xPos - mTranslateX
         val y: Float = yPos - mTranslateY
         //invert the x-coord if we are rotating anti-clockwise
-        x = if ((isClockwise)) x else -x
+        x = if (isClockwise) x else -x
         // convert to arc Angle
-        var angle: Double = Math.toDegrees(
-            (Math.atan2(y.toDouble(), x.toDouble()) + (Math.PI / 2)
+        var angle: Double = Math.toDegrees(atan2(y.toDouble(), x.toDouble()) + (Math.PI / 2)
                     - Math.toRadians(mRotation.toDouble()))
-        )
         if (angle < 0) {
-            angle = 360 + angle
+            angle += 360
         }
         angle -= mStartAngle.toDouble()
         return angle
     }
 
     private fun getProgressForAngle(angle: Double): Int {
-        var touchProgress: Int = Math.round(valuePerDegree() * angle).toInt()
-        touchProgress = if ((touchProgress < 0)) INVALID_PROGRESS_VALUE else touchProgress
-        touchProgress = if ((touchProgress > max)) INVALID_PROGRESS_VALUE else touchProgress
+        var touchProgress: Int = (valuePerDegree() * angle).roundToLong().toInt()
+        touchProgress = if (touchProgress < 0) 0 else touchProgress
+        touchProgress = if (touchProgress > max) max else touchProgress
+
+
         return touchProgress
     }
 
@@ -410,8 +405,8 @@ class SeekArc : View {
 
     private fun updateThumbPosition() {
         val thumbAngle: Int = (mStartAngle + mProgressSweep + mRotation + 90).toInt()
-        mThumbXPos = (mArcRadius * Math.cos(Math.toRadians(thumbAngle.toDouble()))).toInt()
-        mThumbYPos = (mArcRadius * Math.sin(Math.toRadians(thumbAngle.toDouble()))).toInt()
+        mThumbXPos = (mArcRadius * cos(Math.toRadians(thumbAngle.toDouble()))).toInt()
+        mThumbYPos = (mArcRadius * sin(Math.toRadians(thumbAngle.toDouble()))).toInt()
     }
 
     private fun updateProgress(progress: Int, fromUser: Boolean) {
@@ -419,8 +414,8 @@ class SeekArc : View {
         if (progress == INVALID_PROGRESS_VALUE) {
             return
         }
-        progress = if ((progress > max)) max else progress
-        progress = if ((progress < 0)) 0 else progress
+        progress = if (progress > max) max else progress
+        progress = if (progress < 0) 0 else progress
         mProgress = progress
         if (mOnSeekArcChangeListener != null) {
             mOnSeekArcChangeListener!!
@@ -439,10 +434,40 @@ class SeekArc : View {
      * @param l
      * The seek bar notification listener
      *
-     * @see SeekArc.OnSeekBarChangeListener
+     * @see SeekArc.OnSeekArcChangeListener
      */
     fun setOnSeekArcChangeListener(l: OnSeekArcChangeListener?) {
         mOnSeekArcChangeListener = l
+    }
+    fun setRoundedEdges(isEnabled: Boolean) {
+        mRoundedEdges = isEnabled
+        if (mRoundedEdges) {
+            mArcPaint!!.strokeCap = Paint.Cap.ROUND
+            mProgressPaint!!.strokeCap = Paint.Cap.ROUND
+        } else {
+            mArcPaint!!.strokeCap = Paint.Cap.SQUARE
+            mProgressPaint!!.strokeCap = Paint.Cap.SQUARE
+        }
+    }
+
+    fun setTouchInSide(isEnabled: Boolean) {
+        val thumbHalfHeight: Int = mThumb!!.intrinsicHeight / 2
+        val thumbHalfWidth: Int = mThumb!!.intrinsicWidth / 2
+        mTouchInside = isEnabled
+        mTouchIgnoreRadius = if (mTouchInside) {
+            mArcRadius.toFloat() / 4
+        } else {
+            // Don't use the exact radius makes interaction too tricky
+            mArcRadius - min(thumbHalfWidth, thumbHalfHeight).toFloat()
+        }
+    }
+
+    override fun isEnabled(): Boolean {
+        return mEnabled
+    }
+
+    override fun setEnabled(enabled: Boolean) {
+        mEnabled = enabled
     }
 
     var progress: Int
@@ -458,15 +483,15 @@ class SeekArc : View {
         }
         set(mProgressWidth) {
             this.mProgressWidth = mProgressWidth
-            mProgressPaint!!.setStrokeWidth(mProgressWidth.toFloat())
+            mProgressPaint!!.strokeWidth = mProgressWidth.toFloat()
         }
     var arcWidth: Int
         get() {
-            return mArcWidth
+            return this.mArcWidth
         }
         set(mArcWidth) {
             this.mArcWidth = mArcWidth
-            mArcPaint!!.setStrokeWidth(mArcWidth.toFloat())
+            mArcPaint!!.strokeWidth = mArcWidth.toFloat()
         }
     var arcRotation: Int
         get() {
@@ -492,58 +517,54 @@ class SeekArc : View {
             this.mSweepAngle = mSweepAngle
             updateThumbPosition()
         }
-
-    fun setRoundedEdges(isEnabled: Boolean) {
-        mRoundedEdges = isEnabled
-        if (mRoundedEdges) {
-            mArcPaint!!.setStrokeCap(Paint.Cap.ROUND)
-            mProgressPaint!!.setStrokeCap(Paint.Cap.ROUND)
-        } else {
-            mArcPaint!!.setStrokeCap(Paint.Cap.SQUARE)
-            mProgressPaint!!.setStrokeCap(Paint.Cap.SQUARE)
-        }
-    }
-
-    fun setTouchInSide(isEnabled: Boolean) {
-        val thumbHalfheight: Int = mThumb!!.getIntrinsicHeight() / 2
-        val thumbHalfWidth: Int = mThumb!!.getIntrinsicWidth() / 2
-        mTouchInside = isEnabled
-        if (mTouchInside) {
-            mTouchIgnoreRadius = mArcRadius.toFloat() / 4
-        } else {
-            // Don't use the exact radius makes interaction too tricky
-            mTouchIgnoreRadius = (mArcRadius
-                    - Math.min(thumbHalfWidth, thumbHalfheight)).toFloat()
-        }
-    }
-
-    public override fun isEnabled(): Boolean {
-        return mEnabled
-    }
-
-    public override fun setEnabled(enabled: Boolean) {
-        mEnabled = enabled
-    }
-
     var progressColor: Int
         get() {
-            return mProgressPaint!!.getColor()
+            return mProgressPaint!!.color
         }
         set(color) {
-            mProgressPaint!!.setColor(color)
+            mProgressPaint!!.color = color
             invalidate()
         }
     var arcColor: Int
         get() {
-            return mArcPaint!!.getColor()
+            return mArcPaint!!.color
         }
         set(color) {
-            mArcPaint!!.setColor(color)
+            mArcPaint!!.color = color
             invalidate()
+        }
+    var haloRadius: Int
+        get() {
+            TODO()
+        }
+        set(value) {
+
+        }
+
+    var haloColor: ColorStateList
+        get() {
+            TODO()
+        }
+        set(value) {
+
+        }
+
+    var thumb: Drawable?
+        get() {
+            return mThumb
+        }
+        set(value) {
+            mThumb = value
+            val thumbHalfHeight = value!!.intrinsicHeight / 2
+            val thumbHalfWidth = value.intrinsicWidth / 2
+            value.setBounds(
+                -thumbHalfWidth, -thumbHalfHeight, thumbHalfWidth,
+                thumbHalfHeight
+            )
         }
 
     companion object {
-        private val TAG: String = SeekArc::class.java.getSimpleName()
+        private val TAG: String = SeekArc::class.java.simpleName
         private val INVALID_PROGRESS_VALUE: Int = -1
 
         // The initial rotational offset -90 means we start at 12 o'clock

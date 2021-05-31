@@ -24,11 +24,14 @@
 <resources>
 
     <style name="SeekArc">
-        <item name="arcColor">@color/progress_gray_dark</item>
+        <item name="seekArc_arcWidth">@dimen/mtrl_slider_track_height</item>
+        <item name="seekArc_arcColor">@color/material_slider_halo_color</item>
+        <item name="seekArc_progressColor">@color/material_slider_halo_color</item>
+        <item name="seekArc_roundEdges">@color/material_slider_halo_color</item>
     </style>
     
     <style name="SeekArcLight">
-        <item name="arcColor">@color/progress_gray</item>
+        <item name="seekArc_arcColor">@color/material_slider_thumb_color</item>
     </style>
  
 </resources>

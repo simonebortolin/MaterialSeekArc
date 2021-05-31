@@ -78,8 +78,7 @@ public class SimpleActivity extends Activity {
 		mStartAngle.setProgress(mSeekArc.getStartAngle());
 		mSweepAngle.setProgress(mSeekArc.getSweepAngle());
 		mArcWidth.setProgress(mSeekArc.getArcWidth());
-		mProgressWidth.setProgress(mSeekArc.getProgressWidth());
-		
+
 		mSeekArc.setOnSeekArcChangeListener(new SeekArc.OnSeekArcChangeListener() {
 
 			@Override
@@ -173,7 +172,6 @@ public class SimpleActivity extends Activity {
 			
 			@Override
 			public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
-				mSeekArc.setProgressWidth(progress);
 				mSeekArc.invalidate();
 			}
 		});
