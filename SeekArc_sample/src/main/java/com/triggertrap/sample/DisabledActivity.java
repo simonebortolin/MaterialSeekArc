@@ -39,14 +39,14 @@ public class DisabledActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_disabled);
 
-		SeekArc seekArcComplete = (SeekArc) findViewById(R.id.seekArcComplete);
-		SeekArc seekArcWarning = (SeekArc) findViewById(R.id.seekArcWarning);
+		//SeekArc seekArcComplete = (SeekArc) findViewById(R.id.seekArcComplete);
+		//SeekArc seekArcWarning = (SeekArc) findViewById(R.id.seekArcWarning);
 
-		seekArcComplete.setProgressColor(Color.parseColor("#22FF22"));
+		//seekArcComplete.setActiveColor(Color.parseColor("#22FF22"));
 		//seekArcComplete.setProgress(99);
 
-		seekArcWarning.setProgressColor(Color.parseColor("#FF2222"));
-		seekArcWarning.setArcColor(Color.parseColor("#c2c2c2"));
+		//seekArcWarning.setActiveColor(Color.parseColor("#FF2222"));
+		//seekArcWarning.setInactiveColor(Color.parseColor("#c2c2c2"));
 		//seekArcWarning.setProgress(33);
 
 	}

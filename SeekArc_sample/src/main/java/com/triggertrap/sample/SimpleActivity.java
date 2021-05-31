@@ -26,7 +26,6 @@ package com.triggertrap.sample;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -77,7 +76,7 @@ public class SimpleActivity extends Activity {
 		mRotation.setProgress(mSeekArc.getArcRotation());
 		mStartAngle.setProgress(mSeekArc.getStartAngle());
 		mSweepAngle.setProgress(mSeekArc.getSweepAngle());
-		mArcWidth.setProgress(mSeekArc.getArcWidth());
+		mArcWidth.setProgress(mSeekArc.getInactiveWidth());
 
 		mSeekArc.setOnSeekArcChangeListener(new SeekArc.OnSeekArcChangeListener() {
 
@@ -156,7 +155,7 @@ public class SimpleActivity extends Activity {
 			
 			@Override
 			public void onProgressChanged(SeekBar view, int progress, boolean fromUser) {
-				mSeekArc.setArcWidth(progress);
+				mSeekArc.setInactiveWidth(progress);
 				mSeekArc.invalidate();
 			}
 		});

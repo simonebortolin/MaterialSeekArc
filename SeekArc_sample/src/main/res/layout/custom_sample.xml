@@ -45,14 +45,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="30dp"
-            app:seekArc_arcColor="@color/dark_red"
             app:seekArc_clockwise="true"
             app:seekArc_max="150"
-            app:seekArc_progressColor="@color/red"
             app:seekArc_rotation="180"
             app:seekArc_startAngle="30"
             app:seekArc_sweepAngle="300"
-            app:seekArc_thumb="@drawable/custom_seek_arc_control_selector"
             app:seekArc_touchInside="true" />
 
         <TextView

@@ -23,15 +23,13 @@
 -->
 <resources>
 
-    <style name="SeekArc">
-        <item name="seekArc_arcWidth">@dimen/mtrl_slider_track_height</item>
-        <item name="seekArc_arcColor">@color/material_slider_halo_color</item>
-        <item name="seekArc_progressColor">@color/material_slider_halo_color</item>
-        <item name="seekArc_roundEdges">@color/material_slider_halo_color</item>
+    <style name="BaseSeekArc"  parent="android:Widget">
+
+
     </style>
     
-    <style name="SeekArcLight">
-        <item name="seekArc_arcColor">@color/material_slider_thumb_color</item>
+    <style name="SeekArcLight" parent="BaseSeekArc">
+
     </style>
  
 </resources>

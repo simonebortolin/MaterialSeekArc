@@ -41,7 +41,7 @@
             android:layout_height="600dp"
             android:text="padding view to illustrate scrolling"
             android:gravity="center"
-            android:background="@color/progress_gray"
+            android:background="@color/dark_red"
             />
     </LinearLayout>
 </ScrollView>

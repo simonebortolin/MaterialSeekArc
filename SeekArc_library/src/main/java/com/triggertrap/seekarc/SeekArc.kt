@@ -27,17 +27,22 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.content.res.TypedArray
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.RectF
-import android.graphics.drawable.Drawable
+import android.graphics.*
+import android.graphics.drawable.RippleDrawable
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.DimenRes
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.ViewCompat
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.ShapeAppearanceModel
 import kotlin.math.*
+
 
 /**
  *
@@ -49,44 +54,13 @@ import kotlin.math.*
  * @author Neil Davies
  */
 class SeekArc : View {
-    /**
-     * The Drawable for the seek arc thumbnail
-     */
-    private var mThumb: Drawable? = null
+
+    private var thumbDrawable : MaterialShapeDrawable = MaterialShapeDrawable()
 
     /**
      * The Maximum value that this SeekArc can be set to
      */
     var max: Int = 100
-
-    private var mHaloRadius: Int = 0
-
-    private var mHaloColor: Int = 0
-
-    /**
-     * The Current value that the SeekArc is set to
-     */
-    private var mProgress: Int = 0
-
-    /**
-     * The width of the progress line for this SeekArc
-     */
-    private var mProgressWidth: Int = 4
-
-    /**
-     * The width of the progress line for this SeekArc
-     */
-    private var mArcWidth: Int = 4
-
-    /**
-     * The Angle to start drawing this Arc from
-     */
-    private var mStartAngle: Int = 0
-
-    /**
-     * The Angle through which to draw the arc (Max is 360)
-     */
-    private var mSweepAngle: Int = 360
 
     /**
      * The rotation of the SeekArc- 0 is twelve o'clock
@@ -115,10 +89,11 @@ class SeekArc : View {
 
     // Internal variables
     private var mArcRadius: Int = 0
-    private var mProgressSweep: Float = 0f
     private val mArcRect: RectF = RectF()
-    private var mArcPaint: Paint? = null
-    private var mProgressPaint: Paint? = null
+    private var mInactiveTrackPart: Paint? = null
+    private var mActiveTrackPart: Paint? = null
+    private var mThumbPaint: Paint? = null
+    private var mHaloPaint: Paint? = null
     private var mTranslateX: Int = 0
     private var mTranslateY: Int = 0
     private var mThumbXPos: Int = 0
@@ -126,6 +101,7 @@ class SeekArc : View {
     private var mTouchAngle: Double = 0.0
     private var mTouchIgnoreRadius: Float = 0f
     private var mOnSeekArcChangeListener: OnSeekArcChangeListener? = null
+    private var defaultThumbRadius: Int = 0
 
     interface OnSeekArcChangeListener {
         /**
@@ -164,96 +140,97 @@ class SeekArc : View {
         fun onStopTrackingTouch(seekArc: SeekArc?)
     }
 
-    constructor(context: Context) : super(context) {
-        processAttributes(context, null, 0)
-    }
+    constructor(context: Context) : this(context, null, 0)
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        processAttributes(context, attrs, R.attr.seekArcStyle)
-    }
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, R.attr.seekArcStyle)
 
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
-        context,
-        attrs,
-        defStyle
-    ) {
+    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super( context, attrs, defStyle ) {
+        Log.d(TAG, "Initialising SeekArc")
+
+
+        mActiveTrackPart = Paint()
+        mActiveTrackPart!!.isAntiAlias = true
+        mActiveTrackPart!!.style = Paint.Style.STROKE
+        mActiveTrackPart!!.strokeCap = Paint.Cap.ROUND
+
+        mInactiveTrackPart = Paint()
+        mInactiveTrackPart!!.isAntiAlias = true
+        mInactiveTrackPart!!.style = Paint.Style.STROKE
+        mInactiveTrackPart!!.strokeCap = Paint.Cap.ROUND
+
+        mThumbPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mThumbPaint!!.style = Paint.Style.FILL
+        mThumbPaint!!.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+
+        mHaloPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mHaloPaint!!.style = Paint.Style.FILL
+
+        thumbDrawable.shadowCompatibilityMode = MaterialShapeDrawable.SHADOW_COMPAT_MODE_ALWAYS
+
+        loadResources(context.resources)
+
         processAttributes(context, attrs, defStyle)
     }
 
+    private fun loadResources(resources: Resources) {
+        thumbRadius = resources.getDimensionPixelSize(R.dimen.mtrl_slider_thumb_radius)
+        defaultThumbRadius = thumbRadius
+    }
+
     private fun processAttributes(context: Context, attrs: AttributeSet?, defStyle: Int) {
-        Log.d(TAG, "Initialising SeekArc")
-        val res: Resources = resources
-        val density: Float = context.resources.displayMetrics.density
-
-        // Defaults, may need to link this into theme settings
-        var arcColor: Int = ContextCompat.getColor(context,R.color.material_slider_active_track_color)
-        var progressColor: Int = ContextCompat.getColor(context,R.color.material_slider_thumb_color)
-
+        //val density: Float = context.resources.displayMetrics.density
 
         // Convert progress width to pixels for current density
-        this.mArcWidth = (this.mArcWidth * density).toInt()
+        // mArcWidth = (mArcWidth * density).toInt()
         if (attrs != null) {
             // Attribute initialization
             val a: TypedArray = context.obtainStyledAttributes(
                 attrs,
-                R.styleable.SeekArc, defStyle, 0
+                R.styleable.SeekArc, defStyle, R.style.BaseSeekArc
             )
 
-            thumb = a.getDrawable(R.styleable.SeekArc_seekArc_thumb) ?: ResourcesCompat.getDrawable(res, R.drawable.seek_arc_control_selector, context.theme)
+            inactiveColor = a.getColorStateList(R.styleable.SeekArc_seekArc_trackColorInactive) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_inactive_track_color)
+
+            inactiveWidth = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_trackWidthInactive, inactiveWidth)
+
+            activeColor = a.getColorStateList(R.styleable.SeekArc_seekArc_trackColorActive) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_active_track_color)
+
+            activeWidth = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_trackWidthActive, activeWidth)
+
+            if(a.hasValue(R.styleable.SeekArc_seekArc_thumbStrokeColor))
+                thumbStrokeColor = a.getColorStateList(R.styleable.SeekArc_seekArc_thumbStrokeColor)
+
+            thumbStrokeWidth = a.getDimension(R.styleable.SeekArc_seekArc_thumbStrokeWidth, thumbStrokeWidth)
+
+            thumbColor = a.getColorStateList(R.styleable.SeekArc_seekArc_thumbColor) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_thumb_color)
+
+            thumbRadius = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_thumbRadius, thumbRadius)
+
+            thumbElevation = a.getDimension(R.styleable.SeekArc_seekArc_thumbElevation, thumbElevation)
+
+            haloColor = a.getColorStateList(R.styleable.SeekArc_seekArc_haloColor) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_halo_color)
+
+            haloRadius = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_haloRadius, haloRadius)
 
             max = a.getInteger(R.styleable.SeekArc_seekArc_max, max)
-            mProgress = a.getInteger(R.styleable.SeekArc_seekArc_progress, mProgress)
-            mProgressWidth = a.getDimension(
-                R.styleable.SeekArc_seekArc_progressWidth, mProgressWidth.toFloat()
-            ).toInt()
-            mArcWidth = a.getDimension(
-                R.styleable.SeekArc_seekArc_arcWidth,
-                this.mArcWidth.toFloat()
-            ).toInt()
-            mStartAngle = a.getInt(R.styleable.SeekArc_seekArc_startAngle, mStartAngle)
-            mSweepAngle = a.getInt(R.styleable.SeekArc_seekArc_sweepAngle, mSweepAngle)
-            mRotation = a.getInt(R.styleable.SeekArc_seekArc_rotation, mRotation)
-            mRoundedEdges = a.getBoolean(
-                R.styleable.SeekArc_seekArc_roundEdges,
-                mRoundedEdges
-            )
-            mTouchInside = a.getBoolean(
-                R.styleable.SeekArc_seekArc_touchInside,
-                mTouchInside
-            )
-            isClockwise = a.getBoolean(
-                R.styleable.SeekArc_seekArc_clockwise,
-                isClockwise
-            )
-            mEnabled = a.getBoolean(R.styleable.SeekArc_seekArc_enabled, mEnabled)
-            arcColor = a.getColor(R.styleable.SeekArc_seekArc_arcColor, arcColor)
-            progressColor = a.getColor(
-                R.styleable.SeekArc_seekArc_progressColor,
-                progressColor
-            )
-            a.recycle()
-        }
-        mProgress = if (mProgress > max) max else mProgress
-        mProgress = if (mProgress < 0) 0 else mProgress
-        mSweepAngle = if (mSweepAngle > 360) 360 else mSweepAngle
-        mSweepAngle = if (mSweepAngle < 0) 0 else mSweepAngle
-        mProgressSweep = mProgress.toFloat() / max * mSweepAngle
-        mStartAngle = if (mStartAngle > 360) 0 else mStartAngle
-        mStartAngle = if (mStartAngle < 0) 0 else mStartAngle
-        mArcPaint = Paint()
-        mArcPaint!!.color = arcColor
-        mArcPaint!!.isAntiAlias = true
-        mArcPaint!!.style = Paint.Style.STROKE
-        mArcPaint!!.strokeWidth = this.mArcWidth.toFloat()
 
-        mProgressPaint = Paint()
-        mProgressPaint!!.color = progressColor
-        mProgressPaint!!.isAntiAlias = true
-        mProgressPaint!!.style = Paint.Style.STROKE
-        mProgressPaint!!.strokeWidth = this.mArcWidth.toFloat()
-        if (mRoundedEdges) {
-            mArcPaint!!.strokeCap = Paint.Cap.ROUND
-            mProgressPaint!!.strokeCap = Paint.Cap.ROUND
+            progress = a.getInteger(R.styleable.SeekArc_seekArc_progress, progress)
+
+            startAngle = a.getInt(R.styleable.SeekArc_seekArc_startAngle, startAngle)
+
+            sweepAngle = a.getInt(R.styleable.SeekArc_seekArc_sweepAngle, sweepAngle)
+
+            mRotation = a.getInt(R.styleable.SeekArc_seekArc_rotation, mRotation)
+
+            mRoundedEdges = a.getBoolean(R.styleable.SeekArc_seekArc_roundEdges, mRoundedEdges )
+
+            mTouchInside = a.getBoolean(R.styleable.SeekArc_seekArc_touchInside, mTouchInside )
+
+            isClockwise = a.getBoolean( R.styleable.SeekArc_seekArc_clockwise, isClockwise )
+
+            mEnabled = a.getBoolean(R.styleable.SeekArc_seekArc_enabled, mEnabled)
+
+            a.recycle()
         }
     }
 
@@ -263,18 +240,18 @@ class SeekArc : View {
         }
 
         // Draw the arcs
-        val arcStart: Int = mStartAngle + mAngleOffset + mRotation
-        val arcSweep: Int = mSweepAngle
-        canvas.drawArc(mArcRect, arcStart.toFloat(), arcSweep.toFloat(), false, mArcPaint!!)
-        if (mProgress > 0)
-            canvas.drawArc(mArcRect, arcStart.toFloat(), mProgressSweep, false, mProgressPaint!!)
+        val arcStart: Int = startAngle + mAngleOffset + mRotation
+        val arcSweep: Int = sweepAngle
+        canvas.drawArc(mArcRect, arcStart.toFloat(), arcSweep.toFloat(), false, mInactiveTrackPart!!)
+        if (progress > 0)
+            canvas.drawArc(mArcRect, arcStart.toFloat(), progressSweep, false, mActiveTrackPart!!)
         if (mEnabled) {
             // Draw the thumb nail
             canvas.translate(
                 (mTranslateX - mThumbXPos).toFloat(),
                 (mTranslateY - mThumbYPos).toFloat()
             )
-            mThumb!!.draw(canvas)
+            thumbDrawable.draw(canvas)
         }
     }
 
@@ -295,7 +272,7 @@ class SeekArc : View {
         val top = (height / 2 - (arcDiameter / 2)).toFloat()
         val left = (width / 2 - (arcDiameter / 2)).toFloat()
         mArcRect.set(left, top, left + arcDiameter, top + arcDiameter)
-        val arcStart: Int = mProgressSweep.toInt() + mStartAngle + mRotation + 90
+        val arcStart: Int = progressSweep.toInt() + startAngle + mRotation + 90
         mThumbXPos = (mArcRadius * cos(Math.toRadians(arcStart.toDouble()))).toInt()
         mThumbYPos = (mArcRadius * sin(Math.toRadians(arcStart.toDouble()))).toInt()
         setTouchInSide(mTouchInside)
@@ -330,9 +307,9 @@ class SeekArc : View {
 
     override fun drawableStateChanged() {
         super.drawableStateChanged()
-        if (mThumb != null && mThumb!!.isStateful) {
+        if (thumbDrawable.isStateful) {
             val state: IntArray = drawableState
-            mThumb!!.state = state
+            thumbDrawable.state = state
         }
         invalidate()
     }
@@ -357,7 +334,7 @@ class SeekArc : View {
         isPressed = true
         mTouchAngle = getTouchDegrees(event.x, event.y)
         val progress: Int = getProgressForAngle(mTouchAngle)
-        onProgressRefresh(progress, true)
+        updateProgress(progress, true)
     }
 
     private fun ignoreTouch(xPos: Float, yPos: Float): Boolean {
@@ -382,46 +359,40 @@ class SeekArc : View {
         if (angle < 0) {
             angle += 360
         }
-        angle -= mStartAngle.toDouble()
+        angle -= startAngle.toDouble()
         return angle
     }
 
     private fun getProgressForAngle(angle: Double): Int {
         var touchProgress: Int = (valuePerDegree() * angle).roundToLong().toInt()
-        touchProgress = if (touchProgress < 0) 0 else touchProgress
-        touchProgress = if (touchProgress > max) max else touchProgress
+        touchProgress = if (touchProgress < 0) if(progress != max) 0 else max else touchProgress
+        touchProgress = if (touchProgress > max) if(progress != 0) max else 0 else touchProgress
 
+        if(progress == max && touchProgress <=max/2)  touchProgress = max
+        if(progress == 0 && touchProgress >=max/2)  touchProgress = 0
 
         return touchProgress
     }
 
     private fun valuePerDegree(): Float {
-        return max.toFloat() / mSweepAngle
-    }
-
-    private fun onProgressRefresh(progress: Int, fromUser: Boolean) {
-        updateProgress(progress, fromUser)
+        return max.toFloat() / sweepAngle
     }
 
     private fun updateThumbPosition() {
-        val thumbAngle: Int = (mStartAngle + mProgressSweep + mRotation + 90).toInt()
+        val thumbAngle: Int = (startAngle + progressSweep + mRotation + 90).toInt()
         mThumbXPos = (mArcRadius * cos(Math.toRadians(thumbAngle.toDouble()))).toInt()
         mThumbYPos = (mArcRadius * sin(Math.toRadians(thumbAngle.toDouble()))).toInt()
     }
 
     private fun updateProgress(progress: Int, fromUser: Boolean) {
-        var progress: Int = progress
         if (progress == INVALID_PROGRESS_VALUE) {
             return
         }
-        progress = if (progress > max) max else progress
-        progress = if (progress < 0) 0 else progress
-        mProgress = progress
+        this.progress = sanitizeInput(progress, 0, 100)
         if (mOnSeekArcChangeListener != null) {
             mOnSeekArcChangeListener!!
                 .onProgressChanged(this, progress, fromUser)
         }
-        mProgressSweep = progress.toFloat() / max * mSweepAngle
         updateThumbPosition()
         invalidate()
     }
@@ -442,17 +413,17 @@ class SeekArc : View {
     fun setRoundedEdges(isEnabled: Boolean) {
         mRoundedEdges = isEnabled
         if (mRoundedEdges) {
-            mArcPaint!!.strokeCap = Paint.Cap.ROUND
-            mProgressPaint!!.strokeCap = Paint.Cap.ROUND
+            mInactiveTrackPart!!.strokeCap = Paint.Cap.ROUND
+            mActiveTrackPart!!.strokeCap = Paint.Cap.ROUND
         } else {
-            mArcPaint!!.strokeCap = Paint.Cap.SQUARE
-            mProgressPaint!!.strokeCap = Paint.Cap.SQUARE
+            mInactiveTrackPart!!.strokeCap = Paint.Cap.SQUARE
+            mActiveTrackPart!!.strokeCap = Paint.Cap.SQUARE
         }
     }
 
     fun setTouchInSide(isEnabled: Boolean) {
-        val thumbHalfHeight: Int = mThumb!!.intrinsicHeight / 2
-        val thumbHalfWidth: Int = mThumb!!.intrinsicWidth / 2
+        val thumbHalfHeight: Int = thumbDrawable.intrinsicHeight / 2
+        val thumbHalfWidth: Int = thumbDrawable.intrinsicWidth / 2
         mTouchInside = isEnabled
         mTouchIgnoreRadius = if (mTouchInside) {
             mArcRadius.toFloat() / 4
@@ -470,98 +441,187 @@ class SeekArc : View {
         mEnabled = enabled
     }
 
-    var progress: Int
-        get() {
-            return mProgress
+    private fun maybeIncreaseTrackSidePadding() {
+        // TODO
+    }
+
+    private fun sanitizeInput(value: Int, min: Int, max: Int) : Int {
+        var v = value
+        v = if (v > max) max else v
+        v = if (v < min) min else v
+        return v
+    }
+    var progress: Int = 0
+        private set
+    var activeWidth: Int = 4
+        set(value) {
+            field = value
+            mActiveTrackPart!!.strokeWidth = field.toFloat()
+            invalidate()
         }
-        set(progress) {
-            updateProgress(progress, false)
+    var inactiveWidth: Int = 4
+        set(value) {
+            field = value
+            mInactiveTrackPart!!.strokeWidth = field.toFloat()
+            invalidate()
         }
-    var progressWidth: Int
-        get() {
-            return mProgressWidth
-        }
-        set(mProgressWidth) {
-            this.mProgressWidth = mProgressWidth
-            mProgressPaint!!.strokeWidth = mProgressWidth.toFloat()
-        }
-    var arcWidth: Int
-        get() {
-            return this.mArcWidth
-        }
-        set(mArcWidth) {
-            this.mArcWidth = mArcWidth
-            mArcPaint!!.strokeWidth = mArcWidth.toFloat()
-        }
+
     var arcRotation: Int
         get() {
             return mRotation
         }
-        set(mRotation) {
-            this.mRotation = mRotation
+        set(value) {
+            this.mRotation = value
             updateThumbPosition()
         }
-    var startAngle: Int
-        get() {
-            return mStartAngle
-        }
-        set(mStartAngle) {
-            this.mStartAngle = mStartAngle
+
+    var startAngle: Int = 0
+        set(value) {
+            field = sanitizeInput(value, 0, 360)
             updateThumbPosition()
         }
-    var sweepAngle: Int
-        get() {
-            return mSweepAngle
-        }
-        set(mSweepAngle) {
-            this.mSweepAngle = mSweepAngle
+
+    var sweepAngle: Int = 0
+        set(value) {
+            field = sanitizeInput(value, 0, 360)
             updateThumbPosition()
         }
-    var progressColor: Int
-        get() {
-            return mProgressPaint!!.color
-        }
-        set(color) {
-            mProgressPaint!!.color = color
+
+    var activeColor: ColorStateList? = null
+        set(value) {
+            if(field == value) return
+
+            field = value
+            mActiveTrackPart!!.color = getColorForState(value)
             invalidate()
         }
-    var arcColor: Int
-        get() {
-            return mArcPaint!!.color
-        }
-        set(color) {
-            mArcPaint!!.color = color
+
+    var inactiveColor: ColorStateList? = null
+        set(value) {
+            if(field == value) return
+
+            field = value
+            mInactiveTrackPart!!.color = getColorForState(value)
             invalidate()
         }
-    var haloRadius: Int
+
+
+
+    var thumbColor: ColorStateList?
         get() {
-            TODO()
+            return thumbDrawable.fillColor
         }
         set(value) {
+            if(thumbDrawable.fillColor == value) return
 
+            thumbDrawable.fillColor = value
+            invalidate()
         }
 
-    var haloColor: ColorStateList
+    var thumbElevation: Float
+        get() { return thumbDrawable.elevation}
+        set(value) {
+            if(thumbDrawable.elevation == value) return
+
+            thumbDrawable.elevation = value
+            invalidate()
+        }
+
+    fun setThumbElevationResource(@DimenRes elevation: Int) {
+        thumbElevation = resources.getDimension(elevation)
+    }
+
+    var thumbRadius: Int = 0
+        set(value) {
+            if (value == field) return
+
+            field = value
+            maybeIncreaseTrackSidePadding()
+
+            thumbDrawable.shapeAppearanceModel =
+                ShapeAppearanceModel.builder().setAllCorners(CornerFamily.ROUNDED, thumbRadius.toFloat()).build()
+            thumbDrawable.setBounds(-thumbRadius, -thumbRadius, thumbRadius, thumbRadius)
+
+            postInvalidate()
+        }
+
+    fun setThumbRadiusResource(@DimenRes radius: Int) {
+        thumbRadius = resources.getDimensionPixelSize(radius)
+    }
+
+    var thumbStrokeColor: ColorStateList?
         get() {
-            TODO()
+            return thumbDrawable.strokeColor
         }
         set(value) {
+            if (thumbDrawable.strokeColor == value) return
 
+            thumbDrawable.strokeColor = value
+
+            postInvalidate()
         }
 
-    var thumb: Drawable?
+    fun setThumbStrokeColorResource(@ColorRes thumbStrokeColorResourceId: Int) {
+        if (thumbStrokeColorResourceId != 0) {
+            thumbStrokeColor = AppCompatResources.getColorStateList(context, thumbStrokeColorResourceId)
+        }
+    }
+
+    var thumbStrokeWidth: Float
         get() {
-            return mThumb
+            return thumbDrawable.strokeWidth
         }
         set(value) {
-            mThumb = value
-            val thumbHalfHeight = value!!.intrinsicHeight / 2
-            val thumbHalfWidth = value.intrinsicWidth / 2
-            value.setBounds(
-                -thumbHalfWidth, -thumbHalfHeight, thumbHalfWidth,
-                thumbHalfHeight
-            )
+            if (thumbDrawable.strokeWidth == value) return
+
+            thumbDrawable.strokeWidth = value
+
+            postInvalidate()
         }
+
+    fun setThumbStrokeWidthResource(@DimenRes thumbStrokeWidthResourceId: Int) {
+        if (thumbStrokeWidthResourceId != 0) {
+            thumbStrokeWidth = resources.getDimension(thumbStrokeWidthResourceId)
+        }
+    }
+
+    var haloRadius: Int = 0
+        set(value) {
+            if (field == value) return
+            field = value
+            if (background is RippleDrawable) {
+                (background as RippleDrawable).radius = value
+                return
+            }
+
+            postInvalidate()
+        }
+
+    var haloColor: ColorStateList? = null
+        set(value) {
+            if(field == value) return
+            field = value
+            if (background is RippleDrawable) {
+                (background as RippleDrawable).setColor(value)
+                return
+            }
+
+            mHaloPaint!!.color = getColorForState(value)
+            mHaloPaint!!.alpha = HALO_ALPHA
+            invalidate()
+
+        }
+
+    private val progressSweep: Float
+        get() {
+            return progress.toFloat() / max * sweepAngle
+        }
+
+
+    @ColorInt
+    private fun getColorForState(colorStateList: ColorStateList?): Int {
+        return colorStateList!!.getColorForState(drawableState, colorStateList.defaultColor)
+    }
 
     companion object {
         private val TAG: String = SeekArc::class.java.simpleName
@@ -569,5 +629,10 @@ class SeekArc : View {
 
         // The initial rotational offset -90 means we start at 12 o'clock
         private val mAngleOffset: Int = -90
+
+        private val HALO_ALPHA = 63
+
     }
+
+
 }

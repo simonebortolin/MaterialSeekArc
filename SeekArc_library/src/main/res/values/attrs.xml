@@ -24,17 +24,24 @@
 <resources>
 
     <declare-styleable name="SeekArc">
-        <attr name="seekArc_thumb" format="reference" />
-        <attr name="seekArc_thumbOffset" format="dimension" />
+        <attr name="seekArc_trackColorInactive" format="color" />
+        <attr name="seekArc_trackWidthInactive" format="dimension" />
+        <attr name="seekArc_trackColorActive" format="color" />
+        <attr name="seekArc_trackWidthActive" format="dimension" />
+        <attr name="seekArc_thumbStrokeColor" format="color" />
+        <attr name="seekArc_thumbStrokeWidth" format="dimension" />
+        <attr name="seekArc_thumbRadius" format="dimension" />
+        <attr name="seekArc_thumbElevation" format="dimension" />
+        <attr name="seekArc_thumbColor" format="color" />
+        <attr name="seekArc_haloColor" format="color" />
+        <attr name="seekArc_haloRadius" format="dimension" />
+
         <attr name="seekArc_max" format="integer" />
-        <attr name="seekArc_progressWidth" format="dimension" />
-        <attr name="seekArc_arcWidth" format="dimension" />
         <attr name="seekArc_progress" format="integer" />
         <attr name="seekArc_rotation" format="integer" />
         <attr name="seekArc_startAngle" format="integer" />
         <attr name="seekArc_sweepAngle" format="integer" />
-        <attr name="seekArc_arcColor" format="color" />
-        <attr name="seekArc_progressColor" format="color" />
+
         <attr name="seekArc_roundEdges" format="boolean" />
         <attr name="seekArc_touchInside" format="boolean" />
         <attr name="seekArc_clockwise" format="boolean" />
@@ -42,7 +49,7 @@
     </declare-styleable>
     
     <declare-styleable name="SeekArcTheme">
-        <attr name="seekArcStyle" format="reference"></attr>        
+        <attr name="seekArcStyle" format="reference" />
     </declare-styleable>
 
 </resources>
