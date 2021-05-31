@@ -1,26 +1,3 @@
-/*******************************************************************************
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Triggertrap Ltd
- * Author Neil Davies
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
 package com.triggertrap.seekarc
 
 import android.content.Context
@@ -34,8 +11,6 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
-import androidx.annotation.DimenRes
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -169,6 +144,10 @@ class SeekArc : View {
         loadResources(context.resources)
 
         processAttributes(context, attrs, defStyle)
+
+        isClickable = true
+
+        isFocusable = true
     }
 
     private fun loadResources(resources: Resources) {
@@ -186,60 +165,55 @@ class SeekArc : View {
     }
 
     private fun processAttributes(context: Context, attrs: AttributeSet?, defStyle: Int) {
-        //val density: Float = context.resources.displayMetrics.density
+        if (attrs == null) return
 
-        // Convert progress width to pixels for current density
-        // mArcWidth = (mArcWidth * density).toInt()
-        if (attrs != null) {
-            // Attribute initialization
-            val a: TypedArray = context.obtainStyledAttributes(
-                attrs,
-                R.styleable.SeekArc, defStyle, R.style.BaseSeekArc
-            )
+        val a: TypedArray = context.obtainStyledAttributes(
+            attrs,
+            R.styleable.SeekArc, defStyle, R.style.BaseSeekArc
+        )
 
-            inactiveColor = a.getColorStateList(R.styleable.SeekArc_seekArc_trackColorInactive) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_inactive_track_color)
+        inactiveColor = a.getColorStateList(R.styleable.SeekArc_seekArc_trackColorInactive) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_inactive_track_color)
 
-            inactiveWidth = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_trackWidthInactive, inactiveWidth)
+        inactiveWidth = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_trackWidthInactive, inactiveWidth)
 
-            activeColor = a.getColorStateList(R.styleable.SeekArc_seekArc_trackColorActive) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_active_track_color)
+        activeColor = a.getColorStateList(R.styleable.SeekArc_seekArc_trackColorActive) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_active_track_color)
 
-            activeWidth = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_trackWidthActive, activeWidth)
+        activeWidth = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_trackWidthActive, activeWidth)
 
-            if(a.hasValue(R.styleable.SeekArc_seekArc_thumbStrokeColor))
-                thumbStrokeColor = a.getColorStateList(R.styleable.SeekArc_seekArc_thumbStrokeColor)
+        if(a.hasValue(R.styleable.SeekArc_seekArc_thumbStrokeColor))
+            thumbStrokeColor = a.getColorStateList(R.styleable.SeekArc_seekArc_thumbStrokeColor)
 
-            thumbStrokeWidth = a.getDimension(R.styleable.SeekArc_seekArc_thumbStrokeWidth, thumbStrokeWidth)
+        thumbStrokeWidth = a.getDimension(R.styleable.SeekArc_seekArc_thumbStrokeWidth, thumbStrokeWidth)
 
-            thumbColor = a.getColorStateList(R.styleable.SeekArc_seekArc_thumbColor) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_thumb_color)
+        thumbColor = a.getColorStateList(R.styleable.SeekArc_seekArc_thumbColor) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_thumb_color)
 
-            thumbRadius = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_thumbRadius, thumbRadius)
+        thumbRadius = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_thumbRadius, thumbRadius)
 
-            thumbElevation = a.getDimension(R.styleable.SeekArc_seekArc_thumbElevation, thumbElevation)
+        thumbElevation = a.getDimension(R.styleable.SeekArc_seekArc_thumbElevation, thumbElevation)
 
-            haloColor = a.getColorStateList(R.styleable.SeekArc_seekArc_haloColor) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_halo_color)
+        haloColor = a.getColorStateList(R.styleable.SeekArc_seekArc_haloColor) ?: AppCompatResources.getColorStateList(context, R.color.material_slider_halo_color)
 
-            haloRadius = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_haloRadius, haloRadius)
+        haloRadius = a.getDimensionPixelSize(R.styleable.SeekArc_seekArc_haloRadius, haloRadius)
 
-            max = a.getInteger(R.styleable.SeekArc_seekArc_max, max)
+        max = a.getInteger(R.styleable.SeekArc_seekArc_max, max)
 
-            progress = a.getInteger(R.styleable.SeekArc_seekArc_progress, progress)
+        progress = a.getInteger(R.styleable.SeekArc_seekArc_progress, progress)
 
-            startAngle = a.getInt(R.styleable.SeekArc_seekArc_startAngle, startAngle)
+        startAngle = a.getInt(R.styleable.SeekArc_seekArc_startAngle, startAngle)
 
-            sweepAngle = a.getInt(R.styleable.SeekArc_seekArc_sweepAngle, sweepAngle)
+        sweepAngle = a.getInt(R.styleable.SeekArc_seekArc_sweepAngle, sweepAngle)
 
-            mRotation = a.getInt(R.styleable.SeekArc_seekArc_rotation, mRotation)
+        mRotation = a.getInt(R.styleable.SeekArc_seekArc_rotation, mRotation)
 
-            mRoundedEdges = a.getBoolean(R.styleable.SeekArc_seekArc_roundEdges, mRoundedEdges )
+        mRoundedEdges = a.getBoolean(R.styleable.SeekArc_seekArc_roundEdges, mRoundedEdges )
 
-            mTouchInside = a.getBoolean(R.styleable.SeekArc_seekArc_touchInside, mTouchInside )
+        mTouchInside = a.getBoolean(R.styleable.SeekArc_seekArc_touchInside, mTouchInside )
 
-            isClockwise = a.getBoolean( R.styleable.SeekArc_seekArc_clockwise, isClockwise )
+        isClockwise = a.getBoolean( R.styleable.SeekArc_seekArc_clockwise, isClockwise )
 
-            mEnabled = a.getBoolean(R.styleable.SeekArc_seekArc_enabled, mEnabled)
+        mEnabled = a.getBoolean(R.styleable.SeekArc_seekArc_enabled, mEnabled)
 
-            a.recycle()
-        }
+        a.recycle()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -248,7 +222,7 @@ class SeekArc : View {
         }
 
         // Draw the arcs
-        val arcStart: Int = startAngle + mAngleOffset + mRotation
+        val arcStart: Int = startAngle + ANGLE_OFFSET + mRotation
         val arcSweep: Int = sweepAngle
         canvas.drawArc(mArcRect, arcStart.toFloat(), arcSweep.toFloat(), false, mInactiveTrackPart!!)
         if (progress > 0)
@@ -369,8 +343,10 @@ class SeekArc : View {
     private fun getTouchDegrees(xPos: Float, yPos: Float): Double {
         var x: Float = xPos - mTranslateX
         val y: Float = yPos - mTranslateY
+
         //invert the x-coord if we are rotating anti-clockwise
         x = if (isClockwise) x else -x
+
         // convert to arc Angle
         var angle: Double = Math.toDegrees(atan2(y.toDouble(), x.toDouble()) + (Math.PI / 2)
                     - Math.toRadians(mRotation.toDouble()))
@@ -432,6 +408,7 @@ class SeekArc : View {
     fun setOnSeekArcChangeListener(l: OnSeekProgressChangeListener?) {
         mOnSeekProgressChangeListener = l
     }
+
     fun setRoundedEdges(isEnabled: Boolean) {
         mRoundedEdges = isEnabled
         if (mRoundedEdges) {
@@ -450,7 +427,6 @@ class SeekArc : View {
         mTouchIgnoreRadius = if (mTouchInside) {
             mArcRadius.toFloat() / 4
         } else {
-            // Don't use the exact radius makes interaction too tricky
             mArcRadius - min(thumbHalfWidth, thumbHalfHeight).toFloat()
         }
     }
@@ -461,10 +437,6 @@ class SeekArc : View {
 
     override fun setEnabled(enabled: Boolean) {
         mEnabled = enabled
-    }
-
-    private fun maybeIncreaseTrackSidePadding() {
-        // TODO
     }
 
     private fun sanitizeInput(value: Int, min: Int, max: Int) : Int {
@@ -529,8 +501,6 @@ class SeekArc : View {
             invalidate()
         }
 
-
-
     var thumbColor: ColorStateList?
         get() {
             return thumbDrawable.fillColor
@@ -551,16 +521,11 @@ class SeekArc : View {
             invalidate()
         }
 
-    fun setThumbElevationResource(@DimenRes elevation: Int) {
-        thumbElevation = resources.getDimension(elevation)
-    }
-
     var thumbRadius: Int = 0
         set(value) {
             if (value == field) return
 
             field = value
-            maybeIncreaseTrackSidePadding()
 
             thumbDrawable.shapeAppearanceModel =
                 ShapeAppearanceModel.builder().setAllCorners(CornerFamily.ROUNDED, thumbRadius.toFloat()).build()
@@ -568,10 +533,6 @@ class SeekArc : View {
 
             postInvalidate()
         }
-
-    fun setThumbRadiusResource(@DimenRes radius: Int) {
-        thumbRadius = resources.getDimensionPixelSize(radius)
-    }
 
     var thumbStrokeColor: ColorStateList?
         get() {
@@ -585,12 +546,6 @@ class SeekArc : View {
             postInvalidate()
         }
 
-    fun setThumbStrokeColorResource(@ColorRes thumbStrokeColorResourceId: Int) {
-        if (thumbStrokeColorResourceId != 0) {
-            thumbStrokeColor = AppCompatResources.getColorStateList(context, thumbStrokeColorResourceId)
-        }
-    }
-
     var thumbStrokeWidth: Float
         get() {
             return thumbDrawable.strokeWidth
@@ -602,12 +557,6 @@ class SeekArc : View {
 
             postInvalidate()
         }
-
-    fun setThumbStrokeWidthResource(@DimenRes thumbStrokeWidthResourceId: Int) {
-        if (thumbStrokeWidthResourceId != 0) {
-            thumbStrokeWidth = resources.getDimension(thumbStrokeWidthResourceId)
-        }
-    }
 
     var haloRadius: Int = 0
         set(value) {
@@ -649,14 +598,10 @@ class SeekArc : View {
 
     companion object {
         private val TAG: String = SeekArc::class.java.simpleName
-        private val INVALID_PROGRESS_VALUE: Int = -1
+        private const val INVALID_PROGRESS_VALUE: Int = -1
 
-        // The initial rotational offset -90 means we start at 12 o'clock
-        private val mAngleOffset: Int = -90
+        private const val ANGLE_OFFSET: Int = -90
 
-        private val HALO_ALPHA = 63
-
+        private const val HALO_ALPHA = 63
     }
-
-
 }
