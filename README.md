@@ -67,13 +67,13 @@ Simply add the View to your layout (There are several custom attributes)
 
 ## Version 2.0
 
-New version completely material and written in Kotlin. The various parameter names are more faithful to those of the android SeekBar material, much code has been rewritten and more has been converted.
+New version completely material and written in Kotlin. The various parameter names are more faithful to those of the android SeekBar material, much code has been rewritten and more has been converted. The main novelty, however, is the use of the AndroidX libraries; for a more detailed breakdown of the differences, I suggest looking at the commits. 
 
 
 ## Previous Version (< 2.0)
 
 The changelog is available in [this github repository](https://github.com/neild001/SeekArc)
-All that is left of the old version is the core and some basic functionality, but the whole logic has completely changed.
+All that is left of the old version is the core and some basic functionality, but the whole logic has completely changed. 
 
 # Some Examples Project
 
