@@ -6,11 +6,11 @@
 Android 3rd party library to make implementing a MaterialSeekArc.
 So what the heck is a SeekArc? Essentially it’s a SeekBar that has been wrapped around a circle. It acts like a SeekBar and generally has the same settings. You can even add a Listener to it as you would with a SeekBar. So if its in a circle why not call it a SeekCircle? The answer is that the SeekArc does have a few more setting than the SeekBar one of these is the sweepAngle, which means that the SeekArc doesn’t have to be drawn as a full circle, and can be drawn as a circle, semi-circle  or quarter arc or whatever you like. Supports min SDK 8. 
 
-![MaterialSeekArc](art/Screenshot_1.png =250x)
-![MaterialSeekArc](art/Screenshot_2.png =250x)
-![MaterialSeekArc](art/Screenshot_3.png =250x)
-![MaterialSeekArc](art/Screenshot_4.png =250x)
-![MaterialSeekArc](art/Screenshot_5.png =250x)
+<img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_1.png" alt="" width="200px"></a>
+<img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_2.png" alt="" width="200px"></a>
+<img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_3.png" alt="" width="200px"></a>
+<img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_4.png" alt="" width="200px"></a>
+<img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_5.png" alt="" width="200px"></a>
 
 # Using the SeekArc
 
@@ -80,11 +80,11 @@ All that is left of the old version is the core and some basic functionality, bu
 
 You can see the MaterialSeekArc working in the sample application:
 
-![Chat App](art/Screenshot_6.png)
-![Chat App](art/Screenshot_7.png)
 
-![Music App](art/Screenshot_8.png)
-![Music App](art/Screenshot_9.png)
+<img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_6.png" alt="" width="200px"></a>
+<img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_7.png" alt="" width="200px"></a>
+<img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_8.png" alt="" width="200px"></a>
+<img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_9.png" alt="" width="200px"></a>
 
 # License
 
