@@ -1,5 +1,5 @@
-# SeekArc
-=======
+# MaterialSeekArc
+
 
 [![](https://jitpack.io/v/simonebortolin/MaterialSeekArc.svg)](https://jitpack.io/#simonebortolin/MaterialSeekArc)
 
