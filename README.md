@@ -9,7 +9,6 @@ So what the heck is a SeekArc? Essentially it’s a SeekBar that has been wrappe
 <img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_1.png" alt="" width="200px"></a>
 <img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_2.png" alt="" width="200px"></a>
 <img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_3.png" alt="" width="200px"></a>
-<img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_4.png" alt="" width="200px"></a>
 <img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_5.png" alt="" width="200px"></a>
 
 # Using the SeekArc
@@ -83,8 +82,10 @@ You can see the MaterialSeekArc working in the sample application:
 
 <img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_6.png" alt="" width="200px"></a>
 <img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_7.png" alt="" width="200px"></a>
-<img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_8.png" alt="" width="200px"></a>
 <img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_9.png" alt="" width="200px"></a>
+
+
+<img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_8.png" alt="" width="500px"></a>
 
 # License
 
