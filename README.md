@@ -65,7 +65,7 @@ Simply add the View to your layout (There are several custom attributes)
             
 # Recent changes 
 
-## Version 2.0
+## Version 2.0.0
 
 New version completely material and written in Kotlin. The various parameter names are more faithful to those of the android SeekBar material, much code has been rewritten and more has been converted. The main novelty, however, is the use of the AndroidX libraries; for a more detailed breakdown of the differences, I suggest looking at the commits. 
 
