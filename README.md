@@ -1,15 +1,16 @@
-SeekArc
+# SeekArc
 =======
 
-# What is a SeekArc?
+[![](https://jitpack.io/v/simonebortolin/MaterialSeekArc.svg)](https://jitpack.io/#simonebortolin/MaterialSeekArc)
 
+Android 3rd party library to make implementing a MaterialSeekArc.
 So what the heck is a SeekArc? Essentially it’s a SeekBar that has been wrapped around a circle. It acts like a SeekBar and generally has the same settings. You can even add a Listener to it as you would with a SeekBar. So if its in a circle why not call it a SeekCircle? The answer is that the SeekArc does have a few more setting than the SeekBar one of these is the sweepAngle, which means that the SeekArc doesn’t have to be drawn as a full circle, and can be drawn as a circle, semi-circle  or quarter arc or whatever you like. Supports min SDK 8. 
 
-<div align="center">
-  <img height="200px" src="raw/arc_sweeps.png"/>
-</div>
-
-[Video demo of the sample project](http://www.youtube.com/watch?v=MefE7mjM94M)
+![MaterialSeekArc](art/Screenshot_1.png)
+![MaterialSeekArc](art/Screenshot_2.png)
+![MaterialSeekArc](art/Screenshot_3.png)
+![MaterialSeekArc](art/Screenshot_4.png)
+![MaterialSeekArc](art/Screenshot_5.png)
 
 # Using the SeekArc
 
@@ -25,24 +26,7 @@ To help with understanding how to use the SeeekArc I’ve put together a sample 
 * Touch inside enable/disable.
 * Enabled - enables/disables touch and the thumbnail 
 
-
-## To use it in your code
-
-Simply add the View to your layout (There are several custom attributes) 
-
-        <com.triggertrap.seekarc.SeekArc
-            android:id="@+id/seekArc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:padding="30dp"
-            seekarc:rotation="180"
-            seekarc:startAngle="30"
-            seekarc:sweepAngle="300"
-            seekarc:touchInside="true" />
-            
-            
-## Adding to your project
+## Installation
 
 This library is not yet released in Maven Central, until then you can add as a library module or use JitPack.io. 
 
@@ -60,40 +44,47 @@ Now add a library dependency (remember to check for latest release)
 
 ```groovy
     dependencies {
-        compile 'com.github.Triggertrap:SeekArc:v1.1'
+        compile 'com.github.simonebortolin:SeekArc:2.0.0'
     }
 ```
 
+## Use
+
+Simply add the View to your layout (There are several custom attributes) 
+
+        <com.simonebortolin.seekarc.MaterialSeekArc
+            android:id="@+id/seekArc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="30dp"
+            seekarc:rotation="180"
+            seekarc:startAngle="30"
+            seekarc:sweepAngle="300"
+            seekarc:touchInside="true" />
+            
+            
+# Recent changes 
+
+## Version 2.0
+
+New version completely material and written in Kotlin. The various parameter names are more faithful to those of the android SeekBar material, much code has been rewritten and more has been converted.
 
 
-#Recent changes 
+## Previous Version (< 2.0)
 
-## Version 1.1
-After a long hiatus we've recently integrated many of the PRs/changes submitted by others so a big thanks for all the contributions. We'll endevour to respond to PRs and updates quicker in future. The following changes have been included in v1.1.
- 
-* converted to gradle
-* latest Android SDK/tools   
-* removed dependency on color that holo blue that caused issues on API < 14. 
-* changes to make compatible with scroll view changes including example in sample app
-* added 'enabled' option that if set to false disables touch and visibility of the thumbnail  
-* set color progress and arc programmatically
-* mProgress typo
-* fixed setting progress via xml 
-* sample updates to show some of the new functionality
-* readme and jitpack.io notes
+The changelog is available in [this github repository](https://github.com/neild001/SeekArc)
+All that is left of the old version is the core and some basic functionality, but the whole logic has completely changed.
 
-## Version 1.0
+# Some Examples Project
 
-* init release
+You can see the MaterialSeekArc working in the sample application:
 
-# Sample Project
+![Chat App](art/Screenshot_6.png)
+![Chat App](art/Screenshot_7.png)
 
-You can see the SeekArc working in the sample application. Just check out the library and sample application as two separate projects and import them into eclipse. Make sure that the Sample app is setup to correctly use the library project. The sample app will let you explore the attributes that can be set on the SeekArc. 
-
-<div align="center">
-  <img height="400px" src="raw/sample_app.png"/>
-</div>
-
+![Music App](art/Screenshot_8.png)
+![Music App](art/Screenshot_9.png)
 
 # License
 
