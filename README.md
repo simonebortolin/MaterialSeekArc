@@ -6,11 +6,11 @@
 Android 3rd party library to make implementing a MaterialSeekArc.
 So what the heck is a SeekArc? Essentially it’s a SeekBar that has been wrapped around a circle. It acts like a SeekBar and generally has the same settings. You can even add a Listener to it as you would with a SeekBar. So if its in a circle why not call it a SeekCircle? The answer is that the SeekArc does have a few more setting than the SeekBar one of these is the sweepAngle, which means that the SeekArc doesn’t have to be drawn as a full circle, and can be drawn as a circle, semi-circle  or quarter arc or whatever you like. Supports min SDK 8. 
 
-![MaterialSeekArc](art/Screenshot_1.png)
-![MaterialSeekArc](art/Screenshot_2.png)
-![MaterialSeekArc](art/Screenshot_3.png)
-![MaterialSeekArc](art/Screenshot_4.png)
-![MaterialSeekArc](art/Screenshot_5.png)
+![MaterialSeekArc](art/Screenshot_1.png =250x)
+![MaterialSeekArc](art/Screenshot_2.png =250x)
+![MaterialSeekArc](art/Screenshot_3.png =250x)
+![MaterialSeekArc](art/Screenshot_4.png =250x)
+![MaterialSeekArc](art/Screenshot_5.png =250x)
 
 # Using the SeekArc
 
