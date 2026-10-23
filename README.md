@@ -1,10 +1,13 @@
 # MaterialSeekArc
 
 
+[![CI](https://github.com/simonebortolin/MaterialSeekArc/actions/workflows/ci.yml/badge.svg)](https://github.com/simonebortolin/MaterialSeekArc/actions/workflows/ci.yml)
 [![](https://jitpack.io/v/simonebortolin/MaterialSeekArc.svg)](https://jitpack.io/#simonebortolin/MaterialSeekArc)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![API](https://img.shields.io/badge/API-23%2B-brightgreen.svg)](https://developer.android.com/about/versions/marshmallow)
 
 Android 3rd party library to make implementing a MaterialSeekArc.
-So what the heck is a SeekArc? Essentially it’s a SeekBar that has been wrapped around a circle. It acts like a SeekBar and generally has the same settings. You can even add a Listener to it as you would with a SeekBar. So if its in a circle why not call it a SeekCircle? The answer is that the SeekArc does have a few more setting than the SeekBar one of these is the sweepAngle, which means that the SeekArc doesn’t have to be drawn as a full circle, and can be drawn as a circle, semi-circle  or quarter arc or whatever you like. Supports min SDK 8. 
+So what the heck is a SeekArc? Essentially it’s a SeekBar that has been wrapped around a circle. It acts like a SeekBar and generally has the same settings. You can even add a Listener to it as you would with a SeekBar. So if its in a circle why not call it a SeekCircle? The answer is that the SeekArc does have a few more setting than the SeekBar one of these is the sweepAngle, which means that the SeekArc doesn’t have to be drawn as a full circle, and can be drawn as a circle, semi-circle  or quarter arc or whatever you like. Supports min SDK 23. 
 
 <img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_1.png" alt="" width="200px"></a>
 <img src="https://github.com/simonebortolin/MaterialSeekArc/blob/master/art/Screenshot_2.png" alt="" width="200px"></a>
@@ -29,21 +32,25 @@ To help with understanding how to use the SeeekArc I’ve put together a sample 
 
 This library is not yet released in Maven Central, until then you can add as a library module or use JitPack.io. 
 
-Add remote maven url
+Add remote maven url (in `settings.gradle`)
 
 ```groovy
-    repositories {
-        maven {
-            url "https://jitpack.io"
+    dependencyResolutionManagement {
+        repositories {
+            google()
+            mavenCentral()
+            maven { url "https://jitpack.io" }
         }
     }
 ```
+
+Every release also ships the `.aar` and the sample app `.apk` on the [Releases page](https://github.com/simonebortolin/MaterialSeekArc/releases).
     
 Now add a library dependency (remember to check for latest release)
 
 ```groovy
     dependencies {
-        compile 'com.github.simonebortolin:SeekArc:2.0.0'
+        implementation 'com.github.simonebortolin:MaterialSeekArc:2.1.0'
     }
 ```
 
@@ -63,7 +70,21 @@ Simply add the View to your layout (There are several custom attributes)
             seekarc:touchInside="true" />
             
             
+# Building & releasing
+
+The project builds with Gradle 9, Android Gradle Plugin 9 and JDK 17+:
+
+```sh
+./gradlew :MaterialSeekArc:assembleRelease :app:assembleDebug
+```
+
+The [CI workflow](.github/workflows/ci.yml) builds the library and the sample app on every push and pull request. On `master`, when `VERSION_NAME` in `gradle.properties` doesn't match an existing tag, it creates the tag and a GitHub release with the AAR, the sample APK and their checksums. The sample APK is signed with the release key when the `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD` secrets are set; otherwise the debug APK is published. Dependencies and actions are kept up to date by Dependabot.
+
 # Recent changes 
+
+## Version 2.1.0
+
+Build updated to Gradle 9, AGP 9 and Kotlin 2, AndroidX and Material dependencies updated, public CI with automatic releases and Dependabot.
 
 ## Version 2.0.0
 
