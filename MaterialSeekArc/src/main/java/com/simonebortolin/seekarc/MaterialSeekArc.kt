@@ -343,7 +343,7 @@ class MaterialSeekArc : View {
             if (field == value) return
             field = value
             if (background is RippleDrawable) {
-                (background as RippleDrawable).setColor(value)
+                value?.let { (background as RippleDrawable).setColor(it) }
                 return
             }
 
