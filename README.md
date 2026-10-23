@@ -78,7 +78,7 @@ The project builds with Gradle 9, Android Gradle Plugin 9 and JDK 17+:
 ./gradlew :MaterialSeekArc:assembleRelease :app:assembleDebug
 ```
 
-The [CI workflow](.github/workflows/ci.yml) builds the library and the sample app on every push and pull request. On `master`, when `VERSION_NAME` in `gradle.properties` doesn't match an existing tag, it creates the tag and a GitHub release with the AAR, the sample APK and their checksums. The sample APK is signed with the release key when the `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD` secrets are set; otherwise the debug APK is published. Dependencies and actions are kept up to date by Dependabot.
+The [CI workflow](.github/workflows/ci.yml) builds the library and the sample app on every push to `master` and on every pull request. On `master`, when `VERSION_NAME` in `gradle.properties` doesn't match an existing tag, it creates the tag and a GitHub release with the AAR, the sample APK and their checksums. The sample APK is signed with the release key when the `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD` secrets are set; otherwise the debug APK is published. Dependencies and actions are kept up to date by Dependabot.
 
 # Recent changes 
 
