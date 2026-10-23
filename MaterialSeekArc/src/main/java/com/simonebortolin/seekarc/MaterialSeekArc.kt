@@ -13,6 +13,7 @@ import android.view.View
 import androidx.annotation.ColorInt
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
+import com.google.android.material.R as MaterialR
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -638,16 +639,16 @@ class MaterialSeekArc : View {
      * load default resources
      */
     private fun loadResources(resources: Resources) {
-        haloRadius = resources.getDimensionPixelSize(R.dimen.mtrl_slider_halo_radius)
+        haloRadius = resources.getDimensionPixelSize(MaterialR.dimen.mtrl_slider_halo_radius)
 
         thumbElevation =
-            resources.getDimensionPixelSize(R.dimen.mtrl_slider_thumb_elevation).toFloat()
+            resources.getDimensionPixelSize(MaterialR.dimen.mtrl_slider_thumb_elevation).toFloat()
 
-        thumbRadius = resources.getDimensionPixelSize(R.dimen.mtrl_slider_thumb_radius)
+        thumbRadius = resources.getDimensionPixelSize(MaterialR.dimen.mtrl_slider_thumb_radius)
 
-        inactiveWidth = resources.getDimensionPixelSize(R.dimen.mtrl_slider_track_height)
+        inactiveWidth = resources.getDimensionPixelSize(MaterialR.dimen.mtrl_slider_track_height)
 
-        activeWidth = resources.getDimensionPixelSize(R.dimen.mtrl_slider_track_height)
+        activeWidth = resources.getDimensionPixelSize(MaterialR.dimen.mtrl_slider_track_height)
 
         defaultThumbRadius = thumbRadius
     }
@@ -668,7 +669,7 @@ class MaterialSeekArc : View {
         inactiveColor = a.getColorStateList(R.styleable.MaterialSeekArc_trackColorInactive)
             ?: AppCompatResources.getColorStateList(
                 context,
-                R.color.material_slider_inactive_track_color
+                MaterialR.color.material_slider_inactive_track_color
             )
 
         inactiveWidth =
@@ -677,7 +678,7 @@ class MaterialSeekArc : View {
         activeColor = a.getColorStateList(R.styleable.MaterialSeekArc_trackColorActive)
             ?: AppCompatResources.getColorStateList(
                 context,
-                R.color.material_slider_active_track_color
+                MaterialR.color.material_slider_active_track_color
             )
 
         activeWidth =
@@ -690,14 +691,14 @@ class MaterialSeekArc : View {
             a.getDimension(R.styleable.MaterialSeekArc_thumbStrokeWidth, thumbStrokeWidth)
 
         thumbColor = a.getColorStateList(R.styleable.MaterialSeekArc_thumbColor)
-            ?: AppCompatResources.getColorStateList(context, R.color.material_slider_thumb_color)
+            ?: AppCompatResources.getColorStateList(context, MaterialR.color.material_slider_thumb_color)
 
         thumbRadius = a.getDimensionPixelSize(R.styleable.MaterialSeekArc_thumbRadius, thumbRadius)
 
         thumbElevation = a.getDimension(R.styleable.MaterialSeekArc_thumbElevation, thumbElevation)
 
         haloColor = a.getColorStateList(R.styleable.MaterialSeekArc_haloColor)
-            ?: AppCompatResources.getColorStateList(context, R.color.material_slider_halo_color)
+            ?: AppCompatResources.getColorStateList(context, MaterialR.color.material_slider_halo_color)
 
         haloRadius = a.getDimensionPixelSize(R.styleable.MaterialSeekArc_haloRadius, haloRadius)
 
