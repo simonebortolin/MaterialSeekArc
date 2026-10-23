@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = 'com.simonebortolin.sample'
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = 'com.simonebortolin.sample'
         minSdk = 23
-        targetSdk = 36
+        targetSdk = 37
         versionCode = VERSION_CODE as int
         versionName = VERSION_NAME
     }
