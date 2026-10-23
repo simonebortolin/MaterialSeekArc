@@ -28,7 +28,6 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled = false
             // Unsigned when no keystore is provided (e.g. pull requests and forks).
             if (System.getenv('ANDROID_KEYSTORE_FILE')) {
                 signingConfig = signingConfigs.release
