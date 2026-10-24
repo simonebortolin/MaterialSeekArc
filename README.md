@@ -35,15 +35,17 @@ The library is published on Maven Central, add the dependency (remember to check
 
 ```groovy
     dependencies {
-        implementation 'io.github.simonebortolin:MaterialSeekArc:2.2.0'
+        implementation 'io.github.simonebortolin:MaterialSeekArc:2.2.1'
     }
 ```
 
 It is also available on [JitPack](https://jitpack.io/#simonebortolin/MaterialSeekArc) as `com.github.simonebortolin:MaterialSeekArc`
 (add `maven { url "https://jitpack.io" }` to the repositories in `settings.gradle`) and on
-[GitHub Packages](https://github.com/simonebortolin/MaterialSeekArc/packages), which requires a GitHub token to download.
+[GitHub Packages](https://github.com/simonebortolin/MaterialSeekArc/packages) as `io.github.simonebortolin:materialseekarc`, which requires a GitHub token to download.
 
-Every release also ships the `.aar` and the sample app `.apk`, with their build provenance attestation,
+The Javadoc of the latest release is on [GitHub Pages](https://simonebortolin.github.io/MaterialSeekArc/).
+
+Every release also ships the `.aar`, the Javadoc `.jar` and the sample app `.apk`, with their build provenance attestation,
 on the [Releases page](https://github.com/simonebortolin/MaterialSeekArc/releases).
 
 ## Use

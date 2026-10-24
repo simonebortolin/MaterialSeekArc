@@ -40,46 +40,54 @@ dependencies {
 afterEvaluate {
     publishing {
         publications {
-            release(MavenPublication) {
-                from components.release
-                artifactId = 'MaterialSeekArc'
+            // Same library, GitHub Packages does not accept uppercase letters in the artifactId
+            [release: 'MaterialSeekArc', github: 'materialseekarc'].each { publicationName, publicationArtifactId ->
+                create(publicationName, MavenPublication) {
+                    from components.release
+                    artifactId = publicationArtifactId
 
-                // Metadata required by Maven Central
-                pom {
-                    name = 'MaterialSeekArc'
-                    description = 'An arc shaped SeekBar for Android, styled with Material Design.'
-                    url = 'https://github.com/simonebortolin/MaterialSeekArc'
-                    licenses {
-                        license {
-                            name = 'The MIT License'
-                            url = 'https://opensource.org/licenses/MIT'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = 'simonebortolin'
-                            name = 'Simone Bortolin'
-                            url = 'https://github.com/simonebortolin'
-                        }
-                    }
-                    scm {
+                    // Metadata required by Maven Central
+                    pom {
+                        name = 'MaterialSeekArc'
+                        description = 'An arc shaped SeekBar for Android, styled with Material Design.'
                         url = 'https://github.com/simonebortolin/MaterialSeekArc'
-                        connection = 'scm:git:https://github.com/simonebortolin/MaterialSeekArc.git'
-                        developerConnection = 'scm:git:ssh://git@github.com/simonebortolin/MaterialSeekArc.git'
+                        licenses {
+                            license {
+                                name = 'The MIT License'
+                                url = 'https://opensource.org/licenses/MIT'
+                            }
+                        }
+                        developers {
+                            developer {
+                                id = 'simonebortolin'
+                                name = 'Simone Bortolin'
+                                url = 'https://github.com/simonebortolin'
+                            }
+                        }
+                        scm {
+                            url = 'https://github.com/simonebortolin/MaterialSeekArc'
+                            connection = 'scm:git:https://github.com/simonebortolin/MaterialSeekArc.git'
+                            developerConnection = 'scm:git:ssh://git@github.com/simonebortolin/MaterialSeekArc.git'
+                        }
                     }
                 }
             }
         }
         repositories {
-            // Maven layout that CI uploads to GitHub Packages and Maven Central
+            // Maven layouts that CI uploads to Maven Central and GitHub Packages
             maven {
-                name = 'staging'
-                url = layout.buildDirectory.dir('staging-deploy')
+                name = 'central'
+                url = layout.buildDirectory.dir('staging-deploy/central')
+            }
+            maven {
+                name = 'github'
+                url = layout.buildDirectory.dir('staging-deploy/github')
             }
         }
     }
 
-    // Signed only when CI provides the key (ORG_GRADLE_PROJECT_signingKey and signingPassword)
+    // Signed only when CI provides the key (ORG_GRADLE_PROJECT_signingKey and signingPassword),
+    // GitHub Packages does not need the signatures
     def signingKey = findProperty('signingKey')
     if (signingKey) {
         signing {
