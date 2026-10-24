@@ -1,9 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
     id 'maven-publish'
+    id 'signing'
 }
 
-group = 'com.github.simonebortolin'
+// Maven Central and GitHub Packages serve the library as io.github.simonebortolin,
+// JitPack (which sets JITPACK) as com.github.simonebortolin.
+group = System.getenv('JITPACK') ? 'com.github.simonebortolin' : 'io.github.simonebortolin'
 version = VERSION_NAME
 
 android {
@@ -22,6 +25,8 @@ android {
     publishing {
         singleVariant('release') {
             withSourcesJar()
+            // Required by Maven Central
+            withJavadocJar()
         }
     }
 }
@@ -38,7 +43,48 @@ afterEvaluate {
             release(MavenPublication) {
                 from components.release
                 artifactId = 'MaterialSeekArc'
+
+                // Metadata required by Maven Central
+                pom {
+                    name = 'MaterialSeekArc'
+                    description = 'An arc shaped SeekBar for Android, styled with Material Design.'
+                    url = 'https://github.com/simonebortolin/MaterialSeekArc'
+                    licenses {
+                        license {
+                            name = 'The MIT License'
+                            url = 'https://opensource.org/licenses/MIT'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'simonebortolin'
+                            name = 'Simone Bortolin'
+                            url = 'https://github.com/simonebortolin'
+                        }
+                    }
+                    scm {
+                        url = 'https://github.com/simonebortolin/MaterialSeekArc'
+                        connection = 'scm:git:https://github.com/simonebortolin/MaterialSeekArc.git'
+                        developerConnection = 'scm:git:ssh://git@github.com/simonebortolin/MaterialSeekArc.git'
+                    }
+                }
             }
+        }
+        repositories {
+            // Maven layout that CI uploads to GitHub Packages and Maven Central
+            maven {
+                name = 'staging'
+                url = layout.buildDirectory.dir('staging-deploy')
+            }
+        }
+    }
+
+    // Signed only when CI provides the key (ORG_GRADLE_PROJECT_signingKey and signingPassword)
+    def signingKey = findProperty('signingKey')
+    if (signingKey) {
+        signing {
+            useInMemoryPgpKeys(signingKey, findProperty('signingPassword'))
+            sign publishing.publications.release
         }
     }
 }
