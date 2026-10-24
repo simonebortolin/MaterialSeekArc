@@ -20,11 +20,27 @@ import com.google.android.material.shape.ShapeAppearanceModel
 import kotlin.math.*
 
 /**
- * Material Circular SeekBar (SeekArc) view for Android
+ * A circular SeekBar styled with Material Design: the progress is selected by dragging a thumb
+ * along an arc.
  *
- * the code was inspired by this old library for android 4.x https://github.com/neild001/SeekArc
- * obviously the code beyond being in kotlin has been completely remade to level of logic, until
- * for the use of a MaterialShapeDrawable inside a simple Drawable
+ * The arc can be a full circle or any part of it ([startAngle], [sweepAngle], [arcRotation]),
+ * and the track, thumb and halo can be styled from code or with the XML attributes of
+ * `R.styleable.MaterialSeekArc`. Changes of the progress are notified to an
+ * [OnSeekProgressChangeListener].
+ *
+ * ```xml
+ * <com.simonebortolin.seekarc.MaterialSeekArc
+ *     android:layout_width="match_parent"
+ *     android:layout_height="wrap_content"
+ *     android:valueFrom="0"
+ *     android:valueTo="100"
+ *     app:startAngle="30"
+ *     app:sweepAngle="300"
+ *     app:rotation="180" />
+ * ```
+ *
+ * Inspired by [SeekArc](https://github.com/neild001/SeekArc), rewritten in Kotlin around a
+ * MaterialShapeDrawable thumb.
  */
 class MaterialSeekArc : View {
 
@@ -125,23 +141,17 @@ class MaterialSeekArc : View {
         get() = (progress.toFloat() - min) / (max - min) * sweepAngle
 
     /**
-     * is clockwise or anti-clockwise
-     *
-     * Will the progress increase clockwise or anti-clockwise
+     * Whether the progress increases clockwise (`true`, the default) or anti-clockwise.
      */
     var isClockwise: Boolean = true
 
     /**
-     * maximum value
-     *
-     * The Maximum value that this SeekArc can be set to
+     * Maximum value of the [progress], 100 by default.
      */
     var max: Int = 100
 
     /**
-     * minimum value
-     *
-     * The Minimum value that this SeekArc can be set to
+     * Minimum value of the [progress], 0 by default.
      */
     var min: Int = 0
 
@@ -153,13 +163,13 @@ class MaterialSeekArc : View {
     private var middle: Int = (max + min) / 2
 
     /**
-     * actual progress value
+     * Current progress, in the range [min]..[max]. Set it with [setProgress].
      */
     var progress: Int = 0
         private set
 
     /**
-     * active bar border size
+     * Width of the active track (the part that shows the progress), in pixels.
      */
     var activeWidth: Int = 4
         set(value) {
@@ -169,7 +179,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * inactive bar border size
+     * Width of the inactive track (the rest of the arc), in pixels.
      */
     var inactiveWidth: Int = 4
         set(value) {
@@ -179,9 +189,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * arc rotation
-     *
-     * The rotation of the SeekArc- 0 is twelve o'clock
+     * Rotation of the whole arc, in degrees: 0 starts the arc at twelve o'clock.
      */
     var arcRotation: Int = 0
         set(value) {
@@ -190,9 +198,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * rounded edges
-     *
-     * Give the SeekArc rounded edges
+     * Whether the ends of the tracks are rounded (`true`, the default) or square.
      */
     var roundedEdges: Boolean = true
         set(value) {
@@ -208,9 +214,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * start angle of seekarc
-     *
-     * Give the SeekArc start angle [0..360]
+     * Angle where the arc starts, in degrees in the range 0..360, relative to [arcRotation].
      */
     var startAngle: Int = 0
         set(value) {
@@ -219,9 +223,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * angle of seekarc
-     *
-     * The Angle through which to draw the arc [0..360]
+     * Angle covered by the arc, in degrees in the range 0..360: 360 draws a full circle.
      */
     var sweepAngle: Int = 0
         set(value) {
@@ -230,7 +232,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * active color (i.e. the area indicating progress) the of the circle progress bar
+     * Color of the active track (the part that shows the progress).
      */
     var activeColor: ColorStateList? = null
         set(value) {
@@ -242,7 +244,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * inactive (i.e. the area missing at the end) color of the circle progress bar
+     * Color of the inactive track (the rest of the arc).
      */
     var inactiveColor: ColorStateList? = null
         set(value) {
@@ -254,7 +256,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * thumb (i.e. the seekbar circle) color
+     * Fill color of the thumb, the circle dragged along the arc.
      */
     var thumbColor: ColorStateList?
         get() = thumbDrawable.fillColor
@@ -266,7 +268,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * thumb (i.e. the seekbar circle) material elevation (i.e. the edging that makes it look high)
+     * Elevation of the thumb, in pixels, which draws its Material shadow.
      */
     var thumbElevation: Float
         get() = thumbDrawable.elevation
@@ -278,7 +280,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * thumb (i.e. the seekbar circle) radius
+     * Radius of the thumb, in pixels.
      */
     var thumbRadius: Int = 0
         set(value) {
@@ -295,7 +297,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * thumb (i.e. the seekbar circle) stoke (border) color
+     * Color of the thumb border.
      */
     var thumbStrokeColor: ColorStateList?
         get() = thumbDrawable.strokeColor
@@ -308,7 +310,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * thumb (i.e. the seekbar circle) stoke (border) width
+     * Width of the thumb border, in pixels.
      */
     var thumbStrokeWidth: Float
         get() = thumbDrawable.strokeWidth
@@ -321,7 +323,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * halo (i.e. the seekbar onclick bigger circle) radius
+     * Radius of the halo, the larger circle shown around the thumb while it is pressed, in pixels.
      */
     var haloRadius: Int = 0
         set(value) {
@@ -336,7 +338,7 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * halo (i.e. the seekbar onclick bigger circle) color
+     * Color of the halo, the larger circle shown around the thumb while it is pressed.
      */
     var haloColor: ColorStateList? = null
         set(value) {
@@ -354,15 +356,15 @@ class MaterialSeekArc : View {
         }
 
     /**
-     * on seek change listener
+     * Listener notified when the progress changes and when the user starts and stops dragging
+     * the thumb. All the methods have an empty default implementation.
+     *
+     * @see setOnSeekArcChangeListener
      */
     interface OnSeekProgressChangeListener {
         /**
-         * on progress changed handle event
-         *
-         * event that the progress level has changed. Clients can use the
-         * fromUser parameter to distinguish user-initiated changes from those
-         * that occurred programmatically.
+         * Called when the progress changes. Use [fromUser] to tell the changes made by the user
+         * from the ones made from code.
          *
          * @param materialSeekArc The SeekArc whose progress has changed
          * @param progress The current progress, in the range  [MaterialSeekArc.min]...[MaterialSeekArc.max].
@@ -371,30 +373,34 @@ class MaterialSeekArc : View {
         fun onProgressChanged(materialSeekArc: MaterialSeekArc, progress: Int, fromUser: Boolean) {}
 
         /**
-         * on start tracking touch handle event
-         *
-         * event that the user has started a touch gesture. Clients may
-         * want to use this to disable advancing the seekbar.
+         * Called when the user starts dragging the thumb, for example to pause updates of the
+         * progress from code.
          *
          * @param materialSeekArc The SeekArc in which the touch gesture began
          */
         fun onStartTrackingTouch(materialSeekArc: MaterialSeekArc) {}
 
         /**
-         * on stop tracking touch handle event
+         * Called when the user stops dragging the thumb.
          *
-         * event that the user has finished a touch gesture. Clients may
-         * want to use this to re-enable advancing the seekarc.
-         *
-         * @param materialSeekArc The SeekArc in which the touch gesture began
+         * @param materialSeekArc The SeekArc in which the touch gesture ended
          */
         fun onStopTrackingTouch(materialSeekArc: MaterialSeekArc) {}
     }
 
+    /**
+     * Creates the view from code, without a style.
+     */
     constructor(context: Context) : this(context, null, 0)
 
+    /**
+     * Creates the view from XML, with the theme `seekArcStyle` as default style.
+     */
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, R.attr.seekArcStyle)
 
+    /**
+     * Creates the view from XML with the given default style attribute.
+     */
     constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
         context,
         attrs,
@@ -429,12 +435,12 @@ class MaterialSeekArc : View {
     }
 
     /**
-     * get if the view is enabled
+     * Whether the user can drag the thumb. A disabled SeekArc hides the thumb.
      */
     override fun isEnabled(): Boolean = enabled
 
     /**
-     * sets whether the view is enabled
+     * Enables or disables dragging the thumb. A disabled SeekArc hides the thumb.
      */
     override fun setEnabled(enabled: Boolean) {
         this.enabled = enabled
@@ -549,17 +555,19 @@ class MaterialSeekArc : View {
     }
 
     /**
-     * set progress
-     * @param progress the new value
+     * Sets the [progress], without animation.
+     *
+     * @param progress the new value, in the range [min]..[max]
      */
     fun setProgress(progress: Int) {
         updateProgress(progress, false)
     }
 
     /**
-     * set animator progress
-     * @param progress the new value
-     * @param animated if the value is to be arrived at in an animated way
+     * Sets the [progress], optionally moving the thumb there with an animation.
+     *
+     * @param progress the new value, in the range [min]..[max]
+     * @param animated whether to animate the change, stop the animation with [stopProgress]
      */
     fun setProgress(progress: Int, animated: Boolean) {
         if (animated) {
@@ -581,27 +589,27 @@ class MaterialSeekArc : View {
     }
 
     /**
-     * stop animator
+     * Stops the animation started by [setProgress] with `animated = true`.
      */
     fun stopProgress() {
         timeAnimator?.end()
     }
 
     /**
-     * on seek arc change listener
+     * Sets the listener notified of the progress changes and of the start and end of the
+     * user's touch gestures.
      *
-     * Sets a listener to receive notifications of changes to the SeekArc's
-     * progress level. Also provides notifications of when the user starts and
-     * stops a touch gesture within the SeekArc.
-     *
-     * @param l The seek bar notification listener
+     * @param l the listener
      */
     fun setOnSeekArcChangeListener(l: OnSeekProgressChangeListener) {
         onSeekProgressChangeListener = l
     }
 
     /**
-     * sets the touch and ignore touch radius values
+     * Sets where touches move the thumb.
+     *
+     * @param isEnabled `true` to also accept touches inside the arc, `false` to accept only
+     * touches near the arc
      */
     fun setTouchValues(isEnabled: Boolean) {
         val thumbHalfHeight: Int = thumbDrawable.intrinsicHeight / 2
