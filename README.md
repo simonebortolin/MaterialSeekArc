@@ -2,6 +2,7 @@
 
 
 [![CI](https://github.com/simonebortolin/MaterialSeekArc/actions/workflows/ci.yml/badge.svg)](https://github.com/simonebortolin/MaterialSeekArc/actions/workflows/ci.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.simonebortolin/MaterialSeekArc)](https://central.sonatype.com/artifact/io.github.simonebortolin/MaterialSeekArc)
 [![](https://jitpack.io/v/simonebortolin/MaterialSeekArc.svg)](https://jitpack.io/#simonebortolin/MaterialSeekArc)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![API](https://img.shields.io/badge/API-23%2B-brightgreen.svg)](https://developer.android.com/about/versions/marshmallow)
@@ -30,29 +31,20 @@ To help with understanding how to use the SeeekArc I’ve put together a sample 
 
 ## Installation
 
-This library is not yet released in Maven Central, until then you can add as a library module or use JitPack.io. 
-
-Add remote maven url (in `settings.gradle`)
-
-```groovy
-    dependencyResolutionManagement {
-        repositories {
-            google()
-            mavenCentral()
-            maven { url "https://jitpack.io" }
-        }
-    }
-```
-
-Every release also ships the `.aar` and the sample app `.apk` on the [Releases page](https://github.com/simonebortolin/MaterialSeekArc/releases).
-    
-Now add a library dependency (remember to check for latest release)
+The library is published on Maven Central, add the dependency (remember to check for latest release)
 
 ```groovy
     dependencies {
-        implementation 'com.github.simonebortolin:MaterialSeekArc:2.1.0'
+        implementation 'io.github.simonebortolin:MaterialSeekArc:2.2.0'
     }
 ```
+
+It is also available on [JitPack](https://jitpack.io/#simonebortolin/MaterialSeekArc) as `com.github.simonebortolin:MaterialSeekArc`
+(add `maven { url "https://jitpack.io" }` to the repositories in `settings.gradle`) and on
+[GitHub Packages](https://github.com/simonebortolin/MaterialSeekArc/packages), which requires a GitHub token to download.
+
+Every release also ships the `.aar` and the sample app `.apk`, with their build provenance attestation,
+on the [Releases page](https://github.com/simonebortolin/MaterialSeekArc/releases).
 
 ## Use
 
