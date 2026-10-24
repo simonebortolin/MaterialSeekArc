@@ -35,7 +35,7 @@ The library is published on Maven Central, add the dependency (remember to check
 
 ```groovy
     dependencies {
-        implementation 'io.github.simonebortolin:MaterialSeekArc:2.3.0'
+        implementation 'io.github.simonebortolin:MaterialSeekArc:2.2.1'
     }
 ```
 
